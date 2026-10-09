@@ -1,0 +1,953 @@
+{
+  "vault_head": "9fe3473300dbd2855647bfd28be8cafc2f43bd6d",
+  "desktop_head": "452e7789c0dc9671870c3c608e9dd4dca270074a",
+  "files": [
+    {
+      "path": ".obsidian/snippets/Gradient Callouts.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/snippets/Gradient Callouts.css",
+      "sha256": "4d4ad7b488143b13940f79693744e57c3df3d812062b74bdbc0fbd0def958e41"
+    },
+    {
+      "path": ".obsidian/snippets/MCL Gallery Cards.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/snippets/MCL Gallery Cards.css",
+      "sha256": "af3a4ebf8664ce9800240d2860c805538e4bdd4578cc86be871c6246b55c1f9c"
+    },
+    {
+      "path": ".obsidian/snippets/MCL Multi Column.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/snippets/MCL Multi Column.css",
+      "sha256": "5c0cdef0a3730cd0646b7b02ab4f47cc295d111c05515eb83de5b603b08c1e0c"
+    },
+    {
+      "path": ".obsidian/snippets/MCL Wide Views.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/snippets/MCL Wide Views.css",
+      "sha256": "12437e2bce3f4280161ce89a8ea3903271e9670ec4bea6b25cbf02cb8f3c95f5"
+    },
+    {
+      "path": ".obsidian/snippets/base.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/snippets/base.css",
+      "sha256": "7861ae6e444ef39793b836ff35f546e9fe831f003b75ff74a2a1924f74dd8014"
+    },
+    {
+      "path": ".obsidian/snippets/datacore-classes.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/snippets/datacore-classes.css",
+      "sha256": "d8733202807f8584fd9b9402d7ae6a8e97e3355a1c7c6ad62419b64a7eeedd37"
+    },
+    {
+      "path": ".obsidian/snippets/fast.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/snippets/fast.css",
+      "sha256": "8cce71bfdca630b07eaf3f829f4deea4188eaafc9a4aef86b8de435914c30390"
+    },
+    {
+      "path": ".obsidian/snippets/file-explorer-wrap.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/snippets/file-explorer-wrap.css",
+      "sha256": "12c2821d0e2fc97c0f2c4e15425a1e9284fb8a843f9e6abe6070a5a19132016c"
+    },
+    {
+      "path": ".obsidian/snippets/kanban-clean.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/snippets/kanban-clean.css",
+      "sha256": "b11802dc41b796f6bff3a1f56dc227866e495d1c84b4ae59684d388709052065"
+    },
+    {
+      "path": ".obsidian/snippets/show-hover-title.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/snippets/show-hover-title.css",
+      "sha256": "6b4bfab69e528b9cf51696ad5bbd11782a0c06852c831aa73ee6a7cdf2c02fb9"
+    },
+    {
+      "path": "Board/Задачи.base",
+      "source": "~/Documents/obsidian/my dusk/Board/Задачи.base",
+      "sha256": "7b86958815b413bbd3b42f6d9bd2bcd2019307c2b13c1d7779ced2e4da294bbf"
+    },
+    {
+      "path": "Board/Начать здесь.md",
+      "source": "~/Documents/obsidian/my dusk/Board/Начать здесь.md",
+      "sha256": "1cb94c3cdd8e4b1fff1f584b4403820651ec013b81cf5ff37191f0d0713320a5"
+    },
+    {
+      "path": "CLAUDE.md",
+      "source": "~/Documents/obsidian/my dusk/CLAUDE.md",
+      "sha256": "ce8289eb39da2d6c66f7db138ecdcb2b8a73cd647adb66143404a9ed86ab713c"
+    },
+    {
+      "path": "SYSTEM/Dusk AI System — документация.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/Dusk AI System — документация.md",
+      "sha256": "1b18407ddf6f8c6b53c6477fca43461ec258726c4cebf4efe4048dbab5a728c3"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/CODE/toggle_todo.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/CODE/toggle_todo.md",
+      "sha256": "ad1ad59dfeddb7e2f23cc29710dcc0c23ff9a1aa16562b02ad8a391b6d768845"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/CODE/toggle_todo_meeting.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/CODE/toggle_todo_meeting.md",
+      "sha256": "41c8f06b0b03a13d7d87d349fe09f0f75623a049ec1d64643e8daed7450f1293"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/CODE/toggle_todo_revert.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/CODE/toggle_todo_revert.md",
+      "sha256": "aaa3ac506197bb3338cf6eb5e5d5b3f80b56abb23927e1ad9104dbff964c439c"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/CSS/Calendar/Calendar View.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/CSS/Calendar/Calendar View.md",
+      "sha256": "a1f755fb3018b1e7c80a1e6c275917793556e4536b490cf520adb4e024588b4a"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/CSS/Calendar/view.css",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/CSS/Calendar/view.css",
+      "sha256": "c3e00c2c4176df5c9adad47b78c16cc8b8699985277c2dc8c246dfd4f4ec25a3"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/CSS/Calendar/view.js",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/CSS/Calendar/view.js",
+      "sha256": "d019dfc3724e79473b173b94d2c8d42e7b1e66fa29b11447e0899268578ce759"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/CSS/Timeline/Tasks Manager.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/CSS/Timeline/Tasks Manager.md",
+      "sha256": "8c8410feb102f1d211a1144331656149b2d4b352b60d8f4dbb397f6b45adf8f7"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/CSS/Timeline/view.css",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/CSS/Timeline/view.css",
+      "sha256": "b73df62b2ed2e3b1cfbfd033592bc636023cbfbf8d49342f01c2f463691b3661"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/CSS/Timeline/view.js",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/CSS/Timeline/view.js",
+      "sha256": "4877e1bf4bc89f014045c981a559d2f2eae0429f095c1a6ebff67d30d6626081"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/Buttons.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/Buttons.md",
+      "sha256": "6e841ca5639fda68b0d8209ead9380e81e1f7b88863fc3f440d4e781b7c35bfb"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/Daily fleeting.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/Daily fleeting.md",
+      "sha256": "52b765013dd9b8bcb5501793175885425bde56bd2a496ceb119d7b560f9e1b20"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/Lite Daily.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/Lite Daily.md",
+      "sha256": "a36a24adb293e94385a9a24d79d08d66e2ce43ab9998e1165e9cfa379481165b"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_area.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_area.md",
+      "sha256": "e982effdfa03b6ed621ef6dd80a8f12163554d3bc1b975f3a97bdc9ae57fe770"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_area_note.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_area_note.md",
+      "sha256": "27a0dd03d835132174285b25ee2fd8913137289f45c565430b2e452ad4496240"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_area_note_sub.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_area_note_sub.md",
+      "sha256": "a128531beda4032788c5cf1dac688ca2c6e8fd5c5a5c1841791ba0abb558cb88"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_contact.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_contact.md",
+      "sha256": "37578d9767ee90894917fd6f11cc4b1b95662f4843aa64c356064d555404ec12"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_daily_note.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_daily_note.md",
+      "sha256": "0a1de9cc7af48a6eaaae368a0213cc92a5a022f0a9e3ba936bf77c3b19be6841"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_documentation_note.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_documentation_note.md",
+      "sha256": "dd2479fb2db7100b9c9974b338327529d859f95796fa76fb53157f390033de2a"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_fleeting_note.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_fleeting_note.md",
+      "sha256": "c6ddc49d75b76510a2db5699b0fe456abafb6651eec1b008d00a021f888d356d"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_literature_note.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_literature_note.md",
+      "sha256": "8b60023698bbc59a0f880a61bf4d0ad179ed8c90c958bce88705d2f440679025"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_meeting_general.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_meeting_general.md",
+      "sha256": "a91847389a7a874f312ee652b08e83ea521e133063f3452f0a1f1e71a2c46eec"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_meeting_standup.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_meeting_standup.md",
+      "sha256": "33da81a4d08b26c01dd2388e2dd30426ef11bbe950cdebd7ae66cbdc951b6f5e"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_meeting_team.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_meeting_team.md",
+      "sha256": "d04b2cd58dc26c5e6efad57c43621190d660a3417d0caa6305c657526b0e2ba2"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_monthly_note.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_monthly_note.md",
+      "sha256": "964d4d17d6127882c0290efae7301ecc634601912768dd5f95019cc53a934db8"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_new_note.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_new_note.md",
+      "sha256": "f8345fdc4ce83e716798bf9f0b64be1831b9f4d354e879254e7198106f18c602"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_permanent_note.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_permanent_note.md",
+      "sha256": "61176b0b0e6dd8d7dbe3a5745f6a69005e75aae7b384811bd25c466174456ac1"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_project.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_project.md",
+      "sha256": "ee829c7918ae13c901001f899c7e682da9e2b06c0e00bee95f9cff76b1fd0bea"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_project_note.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_project_note.md",
+      "sha256": "361982415fc1c1a8b4c34b32ae414c612310cc052b1bb04d073653cd4356364f"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_weekly_note.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_weekly_note.md",
+      "sha256": "bbe87b466ddce6addd913b2b96bccdf7c449de450d93e7f746b9962a1fb5a402"
+    },
+    {
+      "path": "SYSTEM/TEMPLATE/FORMAT/template_workstation_note.md",
+      "source": "~/Documents/obsidian/my dusk/SYSTEM/TEMPLATE/FORMAT/template_workstation_note.md",
+      "sha256": "116b22889f872cf3b6d1b2e8a1848fd73435a4c92ef263107be35bcb57b49367"
+    },
+    {
+      "path": "bot/APPLICATION-CYCLE.md",
+      "source": "~/Documents/obsidian/my dusk/bot/APPLICATION-CYCLE.md",
+      "sha256": "ea4ca72897ffff62e35fd66c4952281a4e0c3e5be89fc16ec1f12db24c7c34be"
+    },
+    {
+      "path": "bot/INTERFACE.md",
+      "source": "~/Documents/obsidian/my dusk/bot/INTERFACE.md",
+      "sha256": "df11573573f247abd3c0abf05ef9dc825bcca226ab7bdfcae153fa1c20955e6e"
+    },
+    {
+      "path": "bot/RESEARCH-BRIDGE.md",
+      "source": "~/Documents/obsidian/my dusk/bot/RESEARCH-BRIDGE.md",
+      "sha256": "e58380f43eb98a43662b6addd18a0118c741746873feb96becea89b7d16eb359"
+    },
+    {
+      "path": "bot/TRANSCRIPT-SOURCE.md",
+      "source": "~/Documents/obsidian/my dusk/bot/TRANSCRIPT-SOURCE.md",
+      "sha256": "813b9c53b1cc4fb76043a2d1e111fec9411c4cbda0e25fc12cb6fb32153935e1"
+    },
+    {
+      "path": "bot/WEEKLY-PLAN.md",
+      "source": "~/Documents/obsidian/my dusk/bot/WEEKLY-PLAN.md",
+      "sha256": "8107651179a4562ee005433d1c20da72b067dc26a5b728bcf485f47d4bf2c399"
+    },
+    {
+      "path": "bot/WEEKLY-REVIEW.md",
+      "source": "~/Documents/obsidian/my dusk/bot/WEEKLY-REVIEW.md",
+      "sha256": "4904de1dc9ce56077b5cca598a92c8451a91732d72b3f6edc3d74293ce04592e"
+    },
+    {
+      "path": "bot/ask.py",
+      "source": "~/Documents/obsidian/my dusk/bot/ask.py",
+      "sha256": "8e2ec1175be740b4634ba2e2a8d854467b4b8e050676f7c1db30769157ffc96d"
+    },
+    {
+      "path": "bot/assistant_router.py",
+      "source": "~/Documents/obsidian/my dusk/bot/assistant_router.py",
+      "sha256": "b2dfcd1ae09d92a3850325516c9826926725e012909fba65a98ff68e02421b40"
+    },
+    {
+      "path": "bot/capture_privacy.py",
+      "source": "~/Documents/obsidian/my dusk/bot/capture_privacy.py",
+      "sha256": "235e3e0003165f25089f44c3e4b386b5588af956134930f5213bbf414d5d07ea"
+    },
+    {
+      "path": "bot/check_privacy.py",
+      "source": "~/Documents/obsidian/my dusk/bot/check_privacy.py",
+      "sha256": "dee502023b708e29afb71517be14b5226010f21cd7cb6d3df2daf3ce0ae84efa"
+    },
+    {
+      "path": "bot/daily_report.sh",
+      "source": "~/Documents/obsidian/my dusk/bot/daily_report.sh",
+      "sha256": "23394a58fa3924adda537c98230570ba4923aeca72cbc688fcfdb7ce68b77c21"
+    },
+    {
+      "path": "bot/dispatch.py",
+      "source": "~/Documents/obsidian/my dusk/bot/dispatch.py",
+      "sha256": "38ee85ca0774a8997a86a3926c81e18f9f7cad64c6f03bac695c9fefa83e6b46"
+    },
+    {
+      "path": "bot/focus.py",
+      "source": "~/Documents/obsidian/my dusk/bot/focus.py",
+      "sha256": "5be20eca7fcad079b6021ddc34b970e8a62afd4d80c825b6a3a72252eaa38bc9"
+    },
+    {
+      "path": "bot/focus_scheduler.py",
+      "source": "~/Documents/obsidian/my dusk/bot/focus_scheduler.py",
+      "sha256": "1269cefdc0bab6f56afde67952d69cbd3494c7c3344fcbdd73bc0225d9e30be1"
+    },
+    {
+      "path": "bot/focus_ui.py",
+      "source": "~/Documents/obsidian/my dusk/bot/focus_ui.py",
+      "sha256": "61e54656c512f3a85a544626a68a105894cf1e8c173b2366570f1fac9cbbdead"
+    },
+    {
+      "path": "bot/frontmatter.py",
+      "source": "~/Documents/obsidian/my dusk/bot/frontmatter.py",
+      "sha256": "ed2dfc4f73c73e7939c58c310350177f30387915037b4754a3889f442dddf43f"
+    },
+    {
+      "path": "bot/health.py",
+      "source": "~/Documents/obsidian/my dusk/bot/health.py",
+      "sha256": "12dc371406782f18a09dbdfb00b80fa7fc781113fd5d5ccca69352c041ee1195"
+    },
+    {
+      "path": "bot/inbox_core.py",
+      "source": "~/Documents/obsidian/my dusk/bot/inbox_core.py",
+      "sha256": "aa6071138d478e18bbd18b1003cc18e6f37f80560fb1601281b492b9f2187310"
+    },
+    {
+      "path": "bot/install_hooks.sh",
+      "source": "~/Documents/obsidian/my dusk/bot/install_hooks.sh",
+      "sha256": "0253a56aeabd12919285bd6f77f6d6314d91d9f63b3cf0cacf847d61005bde74"
+    },
+    {
+      "path": "bot/learn.py",
+      "source": "~/Documents/obsidian/my dusk/bot/learn.py",
+      "sha256": "31f5cabd09e4cdffddacb64edbfe60a4510b214bf422de5d67a5a8f43f3ff9c5"
+    },
+    {
+      "path": "bot/learn_now.sh",
+      "source": "~/Documents/obsidian/my dusk/bot/learn_now.sh",
+      "sha256": "9f245901987b5fd655177083de32c9c0aa0bbe81ba0ad76ed51ed31646d8e2c8"
+    },
+    {
+      "path": "bot/learning_cycle.py",
+      "source": "~/Documents/obsidian/my dusk/bot/learning_cycle.py",
+      "sha256": "d727d29c27d7ee234125b3c6ac83f9916ca9916b2641c5fdb876fc5095df99f2"
+    },
+    {
+      "path": "bot/llm.py",
+      "source": "~/Documents/obsidian/my dusk/bot/llm.py",
+      "sha256": "f49470242a4fe056510b22936d23babc85f6cf8eefd09f956c9a6eefed60177e"
+    },
+    {
+      "path": "bot/market.py",
+      "source": "~/Documents/obsidian/my dusk/bot/market.py",
+      "sha256": "3f7382f4ef659f1279ce34fdb97a951afe397f4fd80479a297b2be37e862f558"
+    },
+    {
+      "path": "bot/permanent.py",
+      "source": "~/Documents/obsidian/my dusk/bot/permanent.py",
+      "sha256": "400f4cc510cf90f3319ed5a09bc42be4d5c7d42a61b7eede959abcc1351a2cf7"
+    },
+    {
+      "path": "bot/permanent_now.sh",
+      "source": "~/Documents/obsidian/my dusk/bot/permanent_now.sh",
+      "sha256": "0432b3c2493c5de6723127a1dfddd32fd43aec22bc32e8de0522f3c6bf7c912f"
+    },
+    {
+      "path": "bot/personal_search.py",
+      "source": "~/Documents/obsidian/my dusk/bot/personal_search.py",
+      "sha256": "bccd2bbc7fb9ba4194160913faad8fe5512e276c15806c4799beb490efeab080"
+    },
+    {
+      "path": "bot/personal_summary.py",
+      "source": "~/Documents/obsidian/my dusk/bot/personal_summary.py",
+      "sha256": "cf0a57b5343a2e3a65e89d88966257cdf16d0184b54691b92adde120342a3a35"
+    },
+    {
+      "path": "bot/queue_store.py",
+      "source": "~/Documents/obsidian/my dusk/bot/queue_store.py",
+      "sha256": "00f6db083c5ac91ff5f8424ebff34c300b3d1f8c77348d8b8c79062a3947c49a"
+    },
+    {
+      "path": "bot/reminder_nlp.py",
+      "source": "~/Documents/obsidian/my dusk/bot/reminder_nlp.py",
+      "sha256": "4ac201eac8a47d4ddb50ee11c6e8edc20f040aa08eca3c69cf27c2eca1f237e5"
+    },
+    {
+      "path": "bot/reminder_scheduler.py",
+      "source": "~/Documents/obsidian/my dusk/bot/reminder_scheduler.py",
+      "sha256": "65c7789b6c7d77c0cd92a0ab9ca7ce7e38b1788147b07f24a6beeaa06b5a1477"
+    },
+    {
+      "path": "bot/reminder_ui.py",
+      "source": "~/Documents/obsidian/my dusk/bot/reminder_ui.py",
+      "sha256": "9fdf51823fde44264e4c5e22e7e8f5f77c731bf94f987255b9451cbc71c4c1da"
+    },
+    {
+      "path": "bot/reminders.py",
+      "source": "~/Documents/obsidian/my dusk/bot/reminders.py",
+      "sha256": "7b375a5566c0450806af30e487b2b397613521e15471ba3ff6e2fe94580b696d"
+    },
+    {
+      "path": "bot/requirements.txt",
+      "source": "~/Documents/obsidian/my dusk/bot/requirements.txt",
+      "sha256": "64183bb04b4d4e3cfb33330eba48b5760df278e3169f965cf208c50dd6e4168b"
+    },
+    {
+      "path": "bot/research_bridge.py",
+      "source": "~/Documents/obsidian/my dusk/bot/research_bridge.py",
+      "sha256": "3c3d49fb661f52df3ddfbf9a7c1aa17f73a5e1b3071421850566eeac190e0265"
+    },
+    {
+      "path": "bot/runtime_store.py",
+      "source": "~/Documents/obsidian/my dusk/bot/runtime_store.py",
+      "sha256": "2efb44cc6b02ae0ee8386f95cb2d5c8bfa4a4fc42ce86cb6d48eb4c004ac9a94"
+    },
+    {
+      "path": "bot/someday.py",
+      "source": "~/Documents/obsidian/my dusk/bot/someday.py",
+      "sha256": "ab189451790893a5791ca7eeb789aca293b387bde406af72af49a5f05801fd83"
+    },
+    {
+      "path": "bot/speech_to_text.py",
+      "source": "~/Documents/obsidian/my dusk/bot/speech_to_text.py",
+      "sha256": "48546a57abd37472c4c387ffeba093973c9b80518d01a2ebc31ad195a87be0fa"
+    },
+    {
+      "path": "bot/status.py",
+      "source": "~/Documents/obsidian/my dusk/bot/status.py",
+      "sha256": "7c1d7821e9caf826b8ab50c01db111f513a552f7e0a664c64a84ebc08120557e"
+    },
+    {
+      "path": "bot/status_now.sh",
+      "source": "~/Documents/obsidian/my dusk/bot/status_now.sh",
+      "sha256": "1657512e3c2ae0b7a903dd13d9b563be62ff06026a01841cb47078b65a28c93e"
+    },
+    {
+      "path": "bot/task_bridge.py",
+      "source": "~/Documents/obsidian/my dusk/bot/task_bridge.py",
+      "sha256": "6bc77e9e8d2f5ce2856e5f9d4c8c52d16a7128e598bc55d61692773cf760698a"
+    },
+    {
+      "path": "bot/task_metadata.py",
+      "source": "~/Documents/obsidian/my dusk/bot/task_metadata.py",
+      "sha256": "ad85c1fba1d3e5f42d83f1bbaaa7de3e553c313d188b41262b1412e79eea80de"
+    },
+    {
+      "path": "bot/task_ui.py",
+      "source": "~/Documents/obsidian/my dusk/bot/task_ui.py",
+      "sha256": "4922d2e4015cdf8c01605da3604669b3f17cbb14dde69aa54bf6d9e794e938b4"
+    },
+    {
+      "path": "bot/telegram_bot.py",
+      "source": "~/Documents/obsidian/my dusk/bot/telegram_bot.py",
+      "sha256": "aca3a7776b739113474e75636e5fb90aa167b018aa2580827e482750f81888cf"
+    },
+    {
+      "path": "bot/test_advance_dates.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_advance_dates.py",
+      "sha256": "6944db6e20d1f2c32fa27bc8f33d5469fec9e1a13dd1ee221fcadc939aea514e"
+    },
+    {
+      "path": "bot/test_dispatch.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_dispatch.py",
+      "sha256": "aecc3b76c78b3028e06448b7b64ac331f0b47cc7100289e944b03ae201940e3e"
+    },
+    {
+      "path": "bot/test_focus.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_focus.py",
+      "sha256": "5de0525bb7243e5775b245769f4df25ec3168cad0ff0d7d36ee7ad4f742c8d3a"
+    },
+    {
+      "path": "bot/test_focus_scheduler.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_focus_scheduler.py",
+      "sha256": "dc1243d8aebb07febe57d2a129e29c4b2622de6e94e0dd8fb1485a326ec876ae"
+    },
+    {
+      "path": "bot/test_focus_ui.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_focus_ui.py",
+      "sha256": "726eaa448af9e96b4187b45f215fd2b3e33653c364d492b7ca9e2d9cb7606468"
+    },
+    {
+      "path": "bot/test_learn_queue.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_learn_queue.py",
+      "sha256": "a7dd0960556b3591e2822d047352050464c49f0fe92b420d55d7e287892c8c09"
+    },
+    {
+      "path": "bot/test_personal_assistant_flow.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_personal_assistant_flow.py",
+      "sha256": "b7eed59e5cc0efdd15f9f1f10b74aa10fca1aa23bca6a7c8cf3d4e8f63a41414"
+    },
+    {
+      "path": "bot/test_personal_assistant_router.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_personal_assistant_router.py",
+      "sha256": "abc81019c69be9318fa085096b70a0bb5b3ad780e78c3f346fce0961fab8654d"
+    },
+    {
+      "path": "bot/test_personal_assistant_search.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_personal_assistant_search.py",
+      "sha256": "b2c067d0689e0ae53c2ce219414de7edb50b2ee250ead226bb5919eded765b94"
+    },
+    {
+      "path": "bot/test_personal_summary.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_personal_summary.py",
+      "sha256": "dfb0e67b66e0dfc787b8d10c81ff4d4b3af1c17eb75b07ae118936c1a24bd92e"
+    },
+    {
+      "path": "bot/test_private_metadata.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_private_metadata.py",
+      "sha256": "308e062462310cf5ae05eed722a1008ad7282d4464194aef41bd88fc5fdddeef"
+    },
+    {
+      "path": "bot/test_queue_store.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_queue_store.py",
+      "sha256": "0032be37ae3b25f4847d66892bf4a7efbb7e043900c8eac55d318454d18dfdaf"
+    },
+    {
+      "path": "bot/test_reminder_nlp.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_reminder_nlp.py",
+      "sha256": "a97a1063c1eb03bd187643986acbbfb1026fed1037053bc229d1675c9821587e"
+    },
+    {
+      "path": "bot/test_reminder_scheduler.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_reminder_scheduler.py",
+      "sha256": "0fee86ae1b91fd230c3311381830e8aa127a921a510c4dab2750f46947760e9b"
+    },
+    {
+      "path": "bot/test_reminder_transport_runtime.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_reminder_transport_runtime.py",
+      "sha256": "e9570dc5a345c18ce30e520fffb16197ecd2e41cc226402648e8dcc7647c7e47"
+    },
+    {
+      "path": "bot/test_reminder_ui.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_reminder_ui.py",
+      "sha256": "50ad4bd185239c5c96c46ec42c783b9fab9ff1aac3e4db32463e4ffd33f62743"
+    },
+    {
+      "path": "bot/test_reminders.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_reminders.py",
+      "sha256": "fab5ab58663eb08840282941101e201d70fa0f757468776f0ed611fa4c09aa2f"
+    },
+    {
+      "path": "bot/test_runtime_store.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_runtime_store.py",
+      "sha256": "12733dfc48a4f16b900c431af5398859ad4c98a987814a6d2b3c0ba38c2b16c8"
+    },
+    {
+      "path": "bot/test_speech_to_text.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_speech_to_text.py",
+      "sha256": "1e9ead8a63f5dad5c47cc611b3a5f187b7aa72473338c3a99f9c806bc63bcb52"
+    },
+    {
+      "path": "bot/test_stage1_pass3.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage1_pass3.py",
+      "sha256": "bd6b1f55e2c0c1e20fd58a12835c7e9cf46887f9d59cdf8a3da6bdf4653a171a"
+    },
+    {
+      "path": "bot/test_stage1_pass4.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage1_pass4.py",
+      "sha256": "e4316eddc72a02806506ebfc19914179397a9f9d730b320317d90508605c9986"
+    },
+    {
+      "path": "bot/test_stage1_pass5.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage1_pass5.py",
+      "sha256": "742a1d8a45a0e4ec5e4cecf48868a6c383f9ea8992132be5ebd3169f2935be4f"
+    },
+    {
+      "path": "bot/test_stage1_plan_regressions.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage1_plan_regressions.py",
+      "sha256": "703bb28057bff552ffa51c49148f0c5c08a0316009ef16dd6352fe2b84125e1f"
+    },
+    {
+      "path": "bot/test_stage1_regressions.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage1_regressions.py",
+      "sha256": "70fb9f732f2fd5cfce7f3806cd2385d47fbab6be04eb67cd597b84aba257d62f"
+    },
+    {
+      "path": "bot/test_stage2a_ingest.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage2a_ingest.py",
+      "sha256": "53d416e23e46945cb6929534e0698d048e5b4c2bc1071569dbf602fc9c3ec3b7"
+    },
+    {
+      "path": "bot/test_stage2a_pass2.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage2a_pass2.py",
+      "sha256": "48351cafa3172934585d08c4497304e90b650a1e8b62e28f54be501d14ac5da3"
+    },
+    {
+      "path": "bot/test_stage2a_pass3.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage2a_pass3.py",
+      "sha256": "3af56c73d2990d50c3f969c63a18d721405c34ac5ff4de0057282fdbd08edce0"
+    },
+    {
+      "path": "bot/test_stage2a_pass4.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage2a_pass4.py",
+      "sha256": "c19112e4d78d76eb3660e576acac228bb42675b09909f0d62faf857e3a56081a"
+    },
+    {
+      "path": "bot/test_stage2a_source.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage2a_source.py",
+      "sha256": "de3768bcae68db75ca8fa8b022561e084d4494c5bfe4a17063e3b5945cfb6084"
+    },
+    {
+      "path": "bot/test_stage2b_cycle.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage2b_cycle.py",
+      "sha256": "63fccb6ed71217f639ebb2b1362ad5b9b52543726fb04ae51035a5bb3223044e"
+    },
+    {
+      "path": "bot/test_stage3_weekly_review.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage3_weekly_review.py",
+      "sha256": "7000c146edce0c5fec86a2bf6055603f6689220cd54cb84ef1124fb258c52c14"
+    },
+    {
+      "path": "bot/test_stage4_research_bridge.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage4_research_bridge.py",
+      "sha256": "53380c935e44f8974babec9f77f3b8f1a0937f28985e38f911b63587ec0224d5"
+    },
+    {
+      "path": "bot/test_stage5_interface.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_stage5_interface.py",
+      "sha256": "662eedf7a00b0ea88245069d2b7024cd50ef04f852c2befc5228215d89e20805"
+    },
+    {
+      "path": "bot/test_task_metadata.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_task_metadata.py",
+      "sha256": "328a1f4ec3dd9d8dfd6e621da687f9c888ac830dc6457cd790ffcdf9d4fd76d2"
+    },
+    {
+      "path": "bot/test_task_metadata_reminders.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_task_metadata_reminders.py",
+      "sha256": "037dcee4aae6bd8ade9de1b5b9671aacb00e36c979528086170b76d7486c02ef"
+    },
+    {
+      "path": "bot/test_telegram_focus.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_telegram_focus.py",
+      "sha256": "d5b123eb6db0f8233d59ff3b451630e450059fd4189aa242944966ded4a846e3"
+    },
+    {
+      "path": "bot/test_telegram_reminders.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_telegram_reminders.py",
+      "sha256": "7e4237955a93b4bc7b3596f6b6ed1694184495bfdc6bd82a33337f646ee89eb3"
+    },
+    {
+      "path": "bot/test_telegram_status.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_telegram_status.py",
+      "sha256": "1099cf576cd44b269bbc220b9da9e1d778d57f7f910eb38199a47f0c72638e28"
+    },
+    {
+      "path": "bot/test_telegram_ux.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_telegram_ux.py",
+      "sha256": "5f4196c05a03ff2294e12d376d0aa71482a872178626be68cb34853c5b2a16cf"
+    },
+    {
+      "path": "bot/test_telegram_ux_pass2.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_telegram_ux_pass2.py",
+      "sha256": "1f1d8865bdaf68aa86ddcf2f84fb7bc2008161a5e216e143536fd27752b6ceeb"
+    },
+    {
+      "path": "bot/test_telegram_ux_pass3.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_telegram_ux_pass3.py",
+      "sha256": "a8a66b1e0e271f1eaf4aec89302dc89d0940fdbb665e43017c02780be9e1f6a8"
+    },
+    {
+      "path": "bot/test_telegram_ux_pass4.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_telegram_ux_pass4.py",
+      "sha256": "7944b30604bc09f26e86da40d5f038e38930b2dac012e2540c312f600dfc42de"
+    },
+    {
+      "path": "bot/test_thought_feed.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_thought_feed.py",
+      "sha256": "88dd72af76916ffa0f7f9d14c804f31baab6d8f3f37f0ed528883029ba025f6e"
+    },
+    {
+      "path": "bot/test_thought_telegram.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_thought_telegram.py",
+      "sha256": "6a1b9a0a8faa7e3b6e235975e4b9a610ffa2eb474c45805e2e03da4e5c68b95a"
+    },
+    {
+      "path": "bot/test_weekly_plan.py",
+      "source": "~/Documents/obsidian/my dusk/bot/test_weekly_plan.py",
+      "sha256": "2b9c06acd29358097567a4d836b4b2fc78b97ab68c643b43009a8bca58434755"
+    },
+    {
+      "path": "bot/thought_feed.py",
+      "source": "~/Documents/obsidian/my dusk/bot/thought_feed.py",
+      "sha256": "91b06636049bc806b91f52e941bd13c356253dc71ec8d81b965fe2fd32e553d3"
+    },
+    {
+      "path": "bot/transcript_source.py",
+      "source": "~/Documents/obsidian/my dusk/bot/transcript_source.py",
+      "sha256": "a01b92e4cc7b3261dfe504eff622110f16687a6df14cf17f0b85f37edd3e4bcb"
+    },
+    {
+      "path": "bot/triage.py",
+      "source": "~/Documents/obsidian/my dusk/bot/triage.py",
+      "sha256": "66b122774c0ad71ae3a0044a48af1a214da45766c392341b2a4a31b585fa73e1"
+    },
+    {
+      "path": "bot/triage_now.sh",
+      "source": "~/Documents/obsidian/my dusk/bot/triage_now.sh",
+      "sha256": "fbd76127747842166e8d028b9a397a4967d88045f5556d9e8d4a21e6be26ad6b"
+    },
+    {
+      "path": "bot/vault_ops.py",
+      "source": "~/Documents/obsidian/my dusk/bot/vault_ops.py",
+      "sha256": "f9ce4588be94d57e5a1e042c7d6ebffa2d0bb50bb506efb9658b93e4037d4529"
+    },
+    {
+      "path": "bot/vps_activate.sh",
+      "source": "~/Documents/obsidian/my dusk/bot/vps_activate.sh",
+      "sha256": "2b535985d9a830e3aee0f79d5726212f82495f160b272e0dd36c295cea78990f"
+    },
+    {
+      "path": "bot/vps_move_remote.sh",
+      "source": "~/Documents/obsidian/my dusk/bot/vps_move_remote.sh",
+      "sha256": "073d19bdc21387364d6ea9fec1a1fe936587671725cc8d30206d5e1ec4d84d53"
+    },
+    {
+      "path": "bot/weekly_plan.py",
+      "source": "~/Documents/obsidian/my dusk/bot/weekly_plan.py",
+      "sha256": "e4881dc8335e032724b6b5884cacc734ac4250c8a08c285a3da1cc13532e08be"
+    },
+    {
+      "path": "bot/weekly_review.py",
+      "source": "~/Documents/obsidian/my dusk/bot/weekly_review.py",
+      "sha256": "33cc4a757cc5d166051abb8c2c20012418727b37ffbeb7e374e8c4e56e62d5e1"
+    },
+    {
+      "path": "bot/zettel.py",
+      "source": "~/Documents/obsidian/my dusk/bot/zettel.py",
+      "sha256": "3dab146291967545969161757003a30873b1e2989f2f8fefb73c6ec58182ae94"
+    },
+    {
+      "path": "docs/specs/2026-10-09-dusk-personal-assistant-design.md",
+      "source": "~/Documents/obsidian/my dusk/docs/specs/2026-10-09-dusk-personal-assistant-design.md",
+      "sha256": "123683da1378f6581febdd6f47b0a1dedd6f32337882bc0a5e73cdce60e81465"
+    },
+    {
+      "path": "docs/specs/2026-10-09-dusk-recall-focus-reminders-design.md",
+      "source": "~/Documents/obsidian/my dusk/docs/specs/2026-10-09-dusk-recall-focus-reminders-design.md",
+      "sha256": "61e34c71c0b799450a702696f6761c2c3a8425fc15e23101d95d810e9a93e6ec"
+    },
+    {
+      "path": "Пульт.md",
+      "source": "~/Documents/obsidian/my dusk/Пульт.md",
+      "sha256": "af4fe84b96d195ff575bb154da29d01a6f142b3a38a717240e6b27c313096383"
+    },
+    {
+      "path": ".obsidian/plugins/kanban-bases-view/main.js",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/plugins/kanban-bases-view/main.js",
+      "sha256": "154cec90036c1f582c7b1ad270c5ee56466909259dd31bb9e60b91f139c597e3"
+    },
+    {
+      "path": ".obsidian/plugins/kanban-bases-view/styles.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/plugins/kanban-bases-view/styles.css",
+      "sha256": "fe444af65f188f5b8bbf6739364154be498a62fb393e394f0cb3eb23debe2299"
+    },
+    {
+      "path": ".obsidian/plugins/kanban-bases-view/manifest.json",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/plugins/kanban-bases-view/manifest.json",
+      "sha256": "fe6222590b00dd6da8ebc6338111147c004bcf865757b5084bda6d2396ed3e19"
+    },
+    {
+      "path": ".obsidian/plugins/tasknotes/main.js",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/plugins/tasknotes/main.js",
+      "sha256": "2f67e2c70caf13b224d6200cb661f39eeb879c47e8e32f583578a98753a24f99"
+    },
+    {
+      "path": ".obsidian/plugins/tasknotes/styles.css",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/plugins/tasknotes/styles.css",
+      "sha256": "ad6e39567393b96bb5360ca3392870e1ef572bc35cb1912c1a5ab31c5bfd6966"
+    },
+    {
+      "path": ".obsidian/plugins/tasknotes/manifest.json",
+      "source": "~/Documents/obsidian/my dusk/.obsidian/plugins/tasknotes/manifest.json",
+      "sha256": "ff53fc8994129cc215128afe8e1a4e294c2d6b4558722556c38226698ef2a74d"
+    },
+    {
+      "path": "config/dusk-panel/.gitignore",
+      "source": "~/Documents/cursor/me/yabai-setup/config/dusk-panel/.gitignore",
+      "sha256": "99921edb369e12a35a87d768ae481f8c944573626abd4b8f3a1fe78846f30ba7"
+    },
+    {
+      "path": "config/dusk-panel/Package.swift",
+      "source": "~/Documents/cursor/me/yabai-setup/config/dusk-panel/Package.swift",
+      "sha256": "9c0fcdd31992fce3fab662c0cdbc14c4dbe59a6d4a6905e0052b677b9553b0ba"
+    },
+    {
+      "path": "config/dusk-panel/Resources/Info.plist",
+      "source": "~/Documents/cursor/me/yabai-setup/config/dusk-panel/Resources/Info.plist",
+      "sha256": "48365e30d63b6f65fc831fa9311390a16f966c38d702b93594084cbb520b25b7"
+    },
+    {
+      "path": "config/dusk-panel/Sources/DuskPanel/DispatchRunner.swift",
+      "source": "~/Documents/cursor/me/yabai-setup/config/dusk-panel/Sources/DuskPanel/DispatchRunner.swift",
+      "sha256": "c333ba1ec62d5f20841cb384ffe6953989570c587a4ceaf7d4d7b851cec3c588"
+    },
+    {
+      "path": "config/dusk-panel/Sources/DuskPanel/AppDelegate.swift",
+      "source": "~/Documents/cursor/me/yabai-setup/config/dusk-panel/Sources/DuskPanel/AppDelegate.swift",
+      "sha256": "41345adbd3309c3b2f7a7d836cbb3e0f7c83f1cf6d23e57f5c8d7edf63f25469"
+    },
+    {
+      "path": "config/dusk-panel/Sources/DuskPanel/PanelController.swift",
+      "source": "~/Documents/cursor/me/yabai-setup/config/dusk-panel/Sources/DuskPanel/PanelController.swift",
+      "sha256": "fa0f31bab4c8727cf411ab92b6a5e389e8a152b16d8aa1779c97435eca9d44e3"
+    },
+    {
+      "path": "config/dusk-panel/Sources/DuskPanel/main.swift",
+      "source": "~/Documents/cursor/me/yabai-setup/config/dusk-panel/Sources/DuskPanel/main.swift",
+      "sha256": "f0ac8a7ffc4b3ab83ff7bdf1cbb9bfaa6ed6bab725e7348f24aaa6ad2005942e"
+    },
+    {
+      "path": "config/dusk-panel/Sources/DuskPanel/ClipboardAttachmentStore.swift",
+      "source": "~/Documents/cursor/me/yabai-setup/config/dusk-panel/Sources/DuskPanel/ClipboardAttachmentStore.swift",
+      "sha256": "6e50d7d5bf2c263e1310bbd55c45ccd4266a8dad09e385459ed72aef0b29fa2d"
+    },
+    {
+      "path": "config/dusk-panel/Sources/DuskCore/CaptureRequest.swift",
+      "source": "~/Documents/cursor/me/yabai-setup/config/dusk-panel/Sources/DuskCore/CaptureRequest.swift",
+      "sha256": "2c1be36232b4ab2897d7c7a4cb5c16198cb3948c355daa78eaacd0b37df6cd44"
+    },
+    {
+      "path": "config/dusk-panel/Sources/DuskCore/PanelPlacement.swift",
+      "source": "~/Documents/cursor/me/yabai-setup/config/dusk-panel/Sources/DuskCore/PanelPlacement.swift",
+      "sha256": "14adde87fadf2616194a2d69a167c4a9f21005cd757e3aeae20db7c68fb3f05d"
+    },
+    {
+      "path": "config/dusk-panel/Tests/DuskCoreTests/main.swift",
+      "source": "~/Documents/cursor/me/yabai-setup/config/dusk-panel/Tests/DuskCoreTests/main.swift",
+      "sha256": "5e067761ccefa3d00f0a8da14e9daad47d188f617b99891f6bb427b37a56ac44"
+    },
+    {
+      "path": "scripts/build-dusk-panel.sh",
+      "source": "~/Documents/cursor/me/yabai-setup/scripts/build-dusk-panel.sh",
+      "sha256": "4c3f87142434c1d831c097ff4c813b60195deb388d619dc9b73e98c45a505af4"
+    },
+    {
+      "path": "scripts/install-dusk-panel.sh",
+      "source": "~/Documents/cursor/me/yabai-setup/scripts/install-dusk-panel.sh",
+      "sha256": "f53c6e46eff9aae1b6a67b15d265b1c5145bb365fe3aa6effab396077a7c6c77"
+    },
+    {
+      "path": "scripts/setup-btt-dusk.sh",
+      "source": "~/Documents/cursor/me/yabai-setup/scripts/setup-btt-dusk.sh",
+      "sha256": "c3986e046b87ed60afe637cdc7da11017043f298a5598e5a1efe5d99f7d6955e"
+    },
+    {
+      "path": "scripts/setup-dusk-vault.sh",
+      "source": "~/Documents/cursor/me/yabai-setup/scripts/setup-dusk-vault.sh",
+      "sha256": "03a8e84e7f592fd9ea4b3e9462979cf1db55b6e005cde2a3b797965093d005f8"
+    },
+    {
+      "path": "docs/plans/2026-10-05-dusk-panel.md",
+      "source": "~/Documents/cursor/me/yabai-setup/docs/plans/2026-10-05-dusk-panel.md",
+      "sha256": "6e67ba87bef48c53042b1ed8561437bff29cd5c1126a5b992ff7418d6cd17ba2"
+    },
+    {
+      "path": "docs/specs/2026-10-05-dusk-panel-design.md",
+      "source": "~/Documents/cursor/me/yabai-setup/docs/specs/2026-10-05-dusk-panel-design.md",
+      "sha256": "b1260de0efa3b9be270668ec6cfde4cf99942f7f95a672f16f94b936a555756a"
+    },
+    {
+      "path": "desktop/legacy/dusk-capture.py",
+      "source": "~/.local/bin/dusk-capture",
+      "sha256": "cc0c313dbb20fbe25986a8efec07bbd269eb5762034034df00d2fd60724cf417"
+    },
+    {
+      "path": "desktop/launchagents/com.dusk.learn.plist",
+      "source": "~/Library/LaunchAgents/com.dusk.learn.plist",
+      "sha256": "53a25b34f94d82c4e5444d75ee3bc818ba924f8d0e6fd5479f00f17841ce21a5"
+    },
+    {
+      "path": "desktop/launchagents/com.dusk.triage.plist",
+      "source": "~/Library/LaunchAgents/com.dusk.triage.plist",
+      "sha256": "ad8cd7671ef7e59d7d06fe36ea2f6523e27b2ad72569672cb8341fbb48972e4e"
+    },
+    {
+      "path": "desktop/launchagents/com.dusk.status.plist",
+      "source": "~/Library/LaunchAgents/com.dusk.status.plist",
+      "sha256": "d685193d1d8aabe7766fffd67c160cd030d4fe1b8924b11a1303d8ab547ebd0d"
+    },
+    {
+      "path": "desktop/launchagents/com.dusk.vault.sync.plist",
+      "source": "~/Library/LaunchAgents/com.dusk.vault.sync.plist",
+      "sha256": "ef260ca6db12e1b6a6be1eb0ce565c8fb65392674145ae28b5a714ac4edf9121"
+    },
+    {
+      "path": "desktop/launchagents/com.dusk.vault.autopush.plist",
+      "source": "~/Library/LaunchAgents/com.dusk.vault.autopush.plist",
+      "sha256": "1b9d079c0d5d43b501ddd8684bca26b0cfc01580e4ab857a1948e31c987d576e"
+    },
+    {
+      "path": "desktop/launchagents/com.dusk.permanent.plist",
+      "source": "~/Library/LaunchAgents/com.dusk.permanent.plist",
+      "sha256": "611faa2fec8d6c8279f22418b2379f8d589b730069c6df71492f9f3fe953c02c"
+    },
+    {
+      "path": "docs/history/Приёмка Dusk — этап 4.md",
+      "source": "~/Documents/Codex/2026-10-06/new-chat/outputs/Приёмка Dusk — этап 4.md",
+      "sha256": "931fe0b44aa900587cd3ed3ff43150ccf6eb07fa5e9e10e65cc73c8faedf95bb"
+    },
+    {
+      "path": "docs/history/Приёмка Dusk — assistant loop финал.md",
+      "source": "~/Documents/Codex/2026-10-06/new-chat/outputs/Приёмка Dusk — assistant loop финал.md",
+      "sha256": "d1a94d6e29c9596bd07932a97adfc51ba74425f6a572d46f5aedc426bb6f66cf"
+    },
+    {
+      "path": "docs/history/Приёмка Dusk — этап 5.md",
+      "source": "~/Documents/Codex/2026-10-06/new-chat/outputs/Приёмка Dusk — этап 5.md",
+      "sha256": "f4c89ecc3bd1c66928b0c7276d3b4a2ff294e5efee51c55ba8ef672e536f5606"
+    },
+    {
+      "path": "docs/history/Приёмка Dusk — этап 1.md",
+      "source": "~/Documents/Codex/2026-10-06/new-chat/outputs/Приёмка Dusk — этап 1.md",
+      "sha256": "d30939dcbee1d098106b7ad4221ac20a3600a4fcfdfc2946108eee4302a3416f"
+    },
+    {
+      "path": "docs/history/Аудит продуктивности Dusk — 2026-10-06.md",
+      "source": "~/Documents/Codex/2026-10-06/new-chat/outputs/Аудит продуктивности Dusk — 2026-10-06.md",
+      "sha256": "091f3b536409a8dcec6f18854414e1ed69a2245cfedf59e46713b84a9dd031b8"
+    },
+    {
+      "path": "docs/history/Приёмка Dusk — этап 6.md",
+      "source": "~/Documents/Codex/2026-10-06/new-chat/outputs/Приёмка Dusk — этап 6.md",
+      "sha256": "77c499be77ec7c77a4277b59caaf1fa895d499a3ad452d136ee54e7a27308292"
+    },
+    {
+      "path": "docs/history/Приёмка Dusk — этап 2Б.md",
+      "source": "~/Documents/Codex/2026-10-06/new-chat/outputs/Приёмка Dusk — этап 2Б.md",
+      "sha256": "1e51a3104c82e6a90f6ee6a5e261b153e11b15828652019446911ede32342286"
+    },
+    {
+      "path": "docs/history/Приёмка Dusk — этап 3.md",
+      "source": "~/Documents/Codex/2026-10-06/new-chat/outputs/Приёмка Dusk — этап 3.md",
+      "sha256": "0a4be1ddda520af3fad4d3b66105d67d5aa26c1744f336b916a3f372c8f620a8"
+    },
+    {
+      "path": "docs/history/Приёмка Dusk — этап 2А.md",
+      "source": "~/Documents/Codex/2026-10-06/new-chat/outputs/Приёмка Dusk — этап 2А.md",
+      "sha256": "d327006e27fefcd1c44653e96524e959c2dec381b43d3999ecc9cd27da80e060"
+    },
+    {
+      "path": "docs/history/Полный план Dusk — до финала.md",
+      "source": "~/Documents/Codex/2026-10-06/new-chat/outputs/Полный план Dusk — до финала.md",
+      "sha256": "18f245b116dd0e86d04efc0db25407dc18e905ff0c642b5acca8544f77bfaea7"
+    },
+    {
+      "path": "deploy/deepgram/deepgram_proxy.py",
+      "source": "VPS:/opt/dsh/deepgram_proxy.py",
+      "sha256": "0cf35becc185b2165ede9d9beee54f47db295f6478fba70ad38751e3f34e4c69"
+    }
+  ],
+  "sanitized": [
+    ".obsidian/plugins/tasknotes/data.json: safe configuration allowlist; API and MCP disabled, auth empty"
+  ],
+  "excluded": [
+    "vault notes and tasks",
+    "Private",
+    "old Git histories",
+    ".env and credentials",
+    "logs and runtime databases",
+    "venv, build caches and binary apps",
+    "BTT database"
+  ]
+}

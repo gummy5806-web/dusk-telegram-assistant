@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.dusk.permanent</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string><string>-c</string>
+        <string>cd "~/Documents/obsidian/my dusk" &amp;&amp; /bin/bash bot/permanent_now.sh &gt;&gt; /tmp/dusk-permanent.log 2&gt;&amp;1 &amp;&amp; /usr/bin/git add -A &amp;&amp; (/usr/bin/git diff --cached --quiet || /usr/bin/git commit -m "zettel: черновики знаний из повторов") &amp;&amp; /usr/bin/git pull --rebase --autostash -q &amp;&amp; /usr/bin/git push -q</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict><key>Weekday</key><integer>7</integer><key>Hour</key><integer>20</integer><key>Minute</key><integer>0</integer></dict>
+    <key>RunAtLoad</key><false/>
+</dict>
+</plist>

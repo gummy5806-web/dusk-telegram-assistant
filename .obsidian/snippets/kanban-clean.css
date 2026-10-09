@@ -1,0 +1,148 @@
+/* ─────────────────────────────────────────────────────────────
+   Чистая доска — оформление канбана TaskNotes
+   Цель: белая, воздушная, лёгкая. Никаких рамок на всё, никакого шума.
+   Использует переменные темы, поэтому работает и в тёмной.
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Сама доска ───────────────────────────────────────────── */
+.kanban-view__board,
+.kanban-view__board-container {
+    gap: 14px;
+    padding: 10px 4px 24px 4px;
+    align-items: flex-start;
+    background: transparent;
+}
+
+/* ── Колонка: как белая карточка ──────────────────────────── */
+.kanban-view__column {
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 14px;
+    padding: 10px 10px 14px 10px;
+    min-width: 260px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 120ms ease, border-color 120ms ease;
+}
+
+/* В Bases-канбане колонки заполняют всю доступную ширину.
+   На узком окне сохраняем 300px и горизонтальный скролл. */
+.tasknotes-plugin.tn-tasknotesKanban .kanban-view__column {
+    flex: 1 0 300px !important;
+    width: auto !important;
+    max-width: none;
+    box-sizing: border-box;
+}
+
+.kanban-view__column:hover {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+}
+
+/* колонка, в которую тащат карточку — заметная, но не кричащая */
+.kanban-view__column--dragover,
+.kanban-view__column--column-drop-target {
+    border-color: var(--color-accent);
+    background: var(--background-primary-alt);
+    box-shadow: 0 0 0 3px var(--background-modifier-hover);
+}
+
+/* ── Заголовок колонки ────────────────────────────────────── */
+.kanban-view__column-header {
+    padding: 4px 4px 10px 4px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.kanban-view__column-title {
+    font-size: 0.72em;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* счётчик задач — таблеткой */
+.kanban-view__column-count {
+    background: var(--background-secondary);
+    color: var(--text-muted);
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-size: 0.72em;
+    font-variant-numeric: tabular-nums;
+    margin-left: 6px;
+}
+
+/* ── Карточка ─────────────────────────────────────────────── */
+.kanban-view__card-wrapper {
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: transform 110ms ease, box-shadow 110ms ease, border-color 110ms ease;
+    cursor: grab;
+}
+
+.kanban-view__card-wrapper:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
+    border-color: var(--background-modifier-border-hover);
+}
+
+.kanban-view__card-wrapper:active,
+.kanban-view__card--dragging,
+.kanban-view__card-wrapper--dragging {
+    cursor: grabbing;
+    transform: rotate(1.5deg) scale(1.02);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+    border-color: var(--color-accent);
+    opacity: 0.95;
+}
+
+/* выбранная карточка */
+.kanban-view__card-wrapper--selected,
+.kanban-view__card-wrapper--selected-primary {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px var(--background-modifier-hover);
+}
+
+/* ── Свойства на карточке: тише и мельче ──────────────────── */
+.kanban-view__card-wrapper .metadata-property,
+.kanban-view__card-wrapper .metadata-container {
+    font-size: 0.82em;
+    background: transparent;
+    border: none;
+}
+
+.kanban-view__card-wrapper .metadata-property-key,
+.kanban-view__card-wrapper .metadata-property-icon {
+    color: var(--text-faint);
+}
+
+.kanban-view__card-wrapper .metadata-property-value {
+    color: var(--text-muted);
+}
+
+/* ── Воздух внутри колонки ────────────────────────────────── */
+.kanban-view__cards,
+.kanban-view__tasks-container {
+    gap: 8px;
+    padding: 2px;
+}
+
+/* кнопка создания задачи в колонке — мягкая */
+.kanban-view__new-task-button {
+    opacity: 0.5;
+    border-radius: 8px;
+    transition: opacity 120ms ease;
+}
+
+.kanban-view__new-task-button:hover {
+    opacity: 1;
+}
+
+/* ── Свёрнутая колонка не должна ломать вид ───────────────── */
+.kanban-view__column[style*="width: 40px"],
+.kanban-view__column[style*="width: 48px"] {
+    padding: 10px 4px;
+}

@@ -1,0 +1,47 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+**/*credentials*.json
+**/*service-account*.json
+**/*secrets*.json
+**/*keys.txt
+**/*token*.txt
+*.pem
+*.key
+*.p12
+*.pfx
+.vault-secrets/
+# Personal data
+Private/
+ZETA/
+PARA/
+DAILY/
+sessions/
+knowledge/
+HUB/
+Omi/
+STICKY/
+Статус.md
+Недельный обзор.md
+Рынок.md
+# Runtime and build output
+.venv/
+venv/
+bot/venv/
+__pycache__/
+*.py[cod]
+*.log
+*.sqlite*
+*.db
+*.db-*
+.build/
+Prebuilt/
+*.app/
+node_modules/
+.DS_Store
+.obsidian/workspace*.json
+.obsidian/cache/
+.trash/
+*.zip
+*.bundle

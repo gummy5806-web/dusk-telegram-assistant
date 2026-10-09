@@ -1,0 +1,5 @@
+# Preserve imported plugin/template snapshots byte-for-byte, including existing whitespace.
+.obsidian/plugins/** -whitespace
+.obsidian/snippets/** -whitespace
+SYSTEM/TEMPLATE/** -whitespace
+docs/history/** -whitespace
