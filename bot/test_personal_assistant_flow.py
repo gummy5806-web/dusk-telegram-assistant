@@ -71,6 +71,9 @@ class FakeUI:
     SCREEN_MAIN = task_ui.SCREEN_MAIN
     SCREEN_CANCEL = task_ui.SCREEN_CANCEL
 
+    def thought_edit_pending(self, state):
+        return False
+
     def __init__(self):
         self.calls = []
 
@@ -88,7 +91,7 @@ class FakeUI:
         return self.SCREEN_CANCEL if not result.ok else self.SCREEN_MAIN
 
     def _ok(self, label, text):
-        return types.SimpleNamespace(ok=True, text=text, synced=True)
+        return types.SimpleNamespace(ok=True, text=text, synced=True, path="")
 
     def submit_task(self, state, text, vault=None, sync=None):
         self.calls.append(("task", text))
@@ -132,8 +135,15 @@ class ContentHarness:
         def synced(message):
             self.synced.append(message)
 
+        async def reply_task(update, context, result):
+            await update.message.reply_text(result.text, reply_markup="MAIN_KB")
+
+        async def reply_saved(update, context, text, path="", line=""):
+            await update.message.reply_text(text, reply_markup="MAIN_KB")
+
         self.namespace = {
             "re": __import__("re"),
+            "asyncio": __import__("asyncio"),
             "ui": self.ui,
             "assistant_router": assistant_router,
             "personal_search": personal_search,
@@ -146,6 +156,9 @@ class ContentHarness:
             "market": types.SimpleNamespace(parse_command=lambda text: None),
             "append_to_inbox": append,
             "_related_hint": lambda text: "",
+            "_maybe_menu_reminder": self._no_reminder,
+            "_reply_task_submission": reply_task,
+            "_reply_saved_thought": reply_saved,
             "_maybe_reminder_custom": self._no_reminder,
             "_maybe_reminder_intent": self._no_reminder,
             "_vault": lambda: self.vault,

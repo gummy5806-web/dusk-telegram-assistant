@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from dotenv import load_dotenv
 from telegram import (
-    Update, ReplyKeyboardMarkup, KeyboardButton,
+    Update, ReplyKeyboardRemove,
     InlineKeyboardMarkup, InlineKeyboardButton,
 )
 from telegram.ext import (
@@ -67,12 +67,20 @@ BTN_REPORT = ui.BTN_STATUS
 BTN_HEALTH = ui.BTN_HEALTH
 
 
-def main_keyboard() -> ReplyKeyboardMarkup:
-    rows = [ui.MAIN_BUTTONS[i:i + 2] for i in range(0, len(ui.MAIN_BUTTONS), 2)]
-    return ReplyKeyboardMarkup(
-        [[KeyboardButton(label) for label in row] for row in rows],
-        resize_keyboard=True,
-    )
+MENU_REMINDER = "🔔 Напомнить"
+MENU_ACTIONS = (
+    ((ui.BTN_THOUGHT, "m:thought"), (ui.BTN_THOUGHTS, "m:thoughts")),
+    ((ui.BTN_NEW_TASK, "m:new"), (ui.BTN_TASKS, "m:tasks")),
+    ((MENU_REMINDER, "m:remind"), (ui.BTN_STATUS, "m:status")),
+    ((ui.BTN_MATERIAL, "m:material"),),
+)
+
+
+def main_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(label, callback_data=data) for label, data in row]
+        for row in MENU_ACTIONS
+    ])
 
 
 MAIN_KEYBOARD = main_keyboard()
@@ -121,6 +129,8 @@ def _inline(view: ui.View):
         [InlineKeyboardButton(label, callback_data=data) for label, data in row]
         for row in view.rows
     ]
+    if rows:
+        rows.append([InlineKeyboardButton("🏠 Меню", callback_data="m:home")])
     return InlineKeyboardMarkup(rows) if rows else None
 
 
@@ -229,13 +239,139 @@ def _related_hint(text: str) -> str:
     return f"💡 Похоже на старую мысль: {thought.title}"
 
 
+def _clear_inputs(state):
+    ui.cancel(state)
+    reminder_ui.clear_custom(state)
+    ui.clear_thought_edit(state)
+    ui.clear_thought_delete(state)
+    state.pop("menu_reminder_input", None)
+
+
+async def _remove_legacy_keyboard(update, context):
+    if not context.user_data.get("inline_menu_ready"):
+        await update.effective_message.reply_text(
+            "Кнопки теперь прямо в сообщениях. Пиши текстом или голосом.",
+            reply_markup=ReplyKeyboardRemove(), disable_notification=True)
+        context.user_data["inline_menu_ready"] = True
+
+
+async def handle_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not auth_check(update):
+        return
+    _clear_inputs(context.user_data)
+    await _remove_legacy_keyboard(update, context)
+    await update.effective_message.reply_text("Что сделать?", reply_markup=MAIN_KEYBOARD)
+
+
+def _reminder_picker(state, page=0):
+    view = ui.render_list(state, _vault(), page=page, root=(page == 0))
+    rows = []
+    for row in view.rows:
+        converted = []
+        for label, data in row:
+            if data.startswith("t:"):
+                converted.append(("🔔 " + label, "r:d:" + data[2:]))
+            elif data.startswith("l:"):
+                converted.append((label, "m:rp:" + data[2:]))
+        if converted:
+            rows.append(converted)
+    rows.append([("➕ Новое напоминание", "m:remindnew")])
+    return ui.View("🔔 Выбери задачу — затем время.\n\n" + view.text, rows)
+
+
+async def _handle_menu_callback(update, context, data):
+    query = update.callback_query
+    state = context.user_data
+    action = data[2:]
+    _clear_inputs(state)
+    modes = {"thought": ui.MODE_NOTE, "new": ui.MODE_TASK, "material": ui.MODE_VIDEO}
+    if action in modes:
+        prompt = ui.begin(state, modes[action])
+        await ui.safe_edit(query, prompt, cancel_keyboard())
+        return
+    if action == "home":
+        await ui.safe_edit(query, "Что сделать?", MAIN_KEYBOARD)
+        return
+    if action == "status":
+        text = await asyncio.to_thread(_personal_status_text)
+        await ui.safe_edit(query, text, MAIN_KEYBOARD)
+        return
+    if action == "tasks":
+        view = await asyncio.to_thread(ui.render_list, state, _vault(), root=True)
+    elif action == "thoughts":
+        view = await asyncio.to_thread(ui.render_thoughts, state, _vault(),
+                                     store=_runtime_store(), now=_now())
+    elif action == "remind":
+        view = ui.View("🔔 О чём напомнить?", [
+            [("➕ Новое напоминание", "m:remindnew")],
+            [("📋 К существующей задаче", "m:remindtasks")],
+        ])
+    elif action == "remindnew":
+        state["menu_reminder_input"] = True
+        await ui.safe_edit(query,
+            "🔔 Напиши, о чём и когда напомнить, текстом или голосом.\n"
+            "Например: завтра в 9 отправить отчёт.", cancel_keyboard())
+        return
+    elif action == "remindtasks" or action.startswith("rp:"):
+        page = _page(action[3:]) if action.startswith("rp:") else 0
+        view = await asyncio.to_thread(_reminder_picker, state, page)
+    else:
+        await ui.safe_edit(query, "Кнопка устарела. Выбери действие.", MAIN_KEYBOARD)
+        return
+    await ui.safe_edit(query, view.text, _inline(view) or MAIN_KEYBOARD)
+
+
+async def _maybe_menu_reminder(update, context, text):
+    if not context.user_data.get("menu_reminder_input"):
+        return False
+    candidate = text if reminder_nlp.parse_intent(text, now=_now()).kind != "none" else "напомни " + text
+    parsed = reminder_nlp.parse_intent(candidate, now=_now())
+    if parsed.kind != "ok":
+        await update.message.reply_text(
+            "⚠️ " + (parsed.error or reminder_nlp.NO_TIME), reply_markup=cancel_keyboard())
+        return True
+    result = await asyncio.to_thread(reminder_ui.natural_action, context.user_data,
+        _vault(), _runtime_store(), parsed.intent, f"tg:{update.update_id}", _now())
+    if result.sync_required:
+        await asyncio.to_thread(_sync_reminder)
+    if not result.view.stale and not result.view.text.startswith("⚠️"):
+        context.user_data.pop("menu_reminder_input", None)
+    _wake_reminder(context)
+    await update.message.reply_text(result.view.text,
+                                   reply_markup=_inline(result.view) or MAIN_KEYBOARD)
+    return True
+
+
+async def _reply_task_submission(update, context, result):
+    if result.ok and result.path:
+        path = Path(result.path)
+        try:
+            relative = path.relative_to(_vault()).as_posix() if path.is_absolute() else path.as_posix()
+        except ValueError:
+            relative = ""
+        if relative:
+            token = ui.issue_token(context.user_data, str(path if path.is_absolute() else _vault() / path))
+            view = await asyncio.to_thread(_card_view, context.user_data, token, _now())
+            await update.message.reply_text(result.text + "\n\n" + view.text,
+                                           reply_markup=_inline(view) or MAIN_KEYBOARD)
+            return
+    await update.message.reply_text(result.text, reply_markup=_keyboard(ui.keyboard_for(result)))
+
+
+async def _reply_saved_thought(update, context, text, path="", line=""):
+    view = await asyncio.to_thread(ui.saved_thought_view, context.user_data, _vault(), path=path, line=line)
+    await update.message.reply_text(text, reply_markup=_inline(view) or MAIN_KEYBOARD)
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not auth_check(update):
         await update.message.reply_text("Доступ запрещён.")
         return
+    _clear_inputs(context.user_data)
+    await _remove_legacy_keyboard(update, context)
     await update.message.reply_text(
         "Привет. Пиши обычными словами — можно текстом или голосом.\n"
-        "Нажми кнопку, затем отправь только содержание.\n\n"
+        "Кнопки под этим сообщением. Нажми нужную, затем пришли только содержание.\n\n"
         "💭 Мысль — сохранить мысль заметкой.\n"
         f"{ui.BTN_THOUGHTS} — Inbox, последние и забытые мысли; внутри есть поиск.\n"
         "➕ Задача — создать ровно одну задачу (следующее — название).\n"
@@ -247,7 +383,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "в «🧠 Мысли» или превратить в задачу кнопкой. «создай задачу …» создаст "
         "задачу. «что я думал про …» найдёт в Dusk. Вопрос про автора или термин "
         "дополнительно посмотрит агентские конспекты Research Brain.\n\n"
-        "Напомнить можно кнопкой «🔔 Напомнить» в карточке задачи или фразой "
+        "🔔 Напомнить есть в этом меню и в карточке задачи. Фраза тоже работает: "
         "«напомни завтра в 9 отправить отчёт».",
         reply_markup=MAIN_KEYBOARD
     )
@@ -302,12 +438,22 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     text = update.message.text
     state = context.user_data
+    await _remove_legacy_keyboard(update, context)
+    if (text or "").strip().casefold() in ("меню", "menu"):
+        await handle_menu(update, context)
+        return
+    if text == MENU_REMINDER:
+        _clear_inputs(state)
+        state["menu_reminder_input"] = True
+        await update.message.reply_text("🔔 Напиши, о чём и когда напомнить. Например: завтра в 9 отправить отчёт.",
+                                        reply_markup=cancel_keyboard())
+        return
 
     # Main buttons и Отмена сбрасывают custom-reminder ввод, обычный текст — нет.
     if text in ui.MAIN_BUTTONS or text in (
             ui.BTN_SEARCH, ui.BTN_NOTE, ui.BTN_VIDEO, BTN_LEFT, BTN_INBOX,
             ui.BTN_CANCEL, "отмена", "cancel"):
-        reminder_ui.clear_custom(state)
+        _clear_inputs(state)
 
     # --- Главная клавиатура: кнопки важнее режима, ими из него выходят. -----
     if text == ui.BTN_THOUGHT or text == ui.BTN_NOTE:
@@ -422,6 +568,15 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
     text = (text or "").strip()
     state = context.user_data
 
+    if await _maybe_menu_reminder(update, context, text):
+        return
+    if ui.thought_edit_pending(state):
+        result = await asyncio.to_thread(ui.submit_thought_edit, state, _vault(), text, sync=_sync_note)
+        if result.ok:
+            await _reply_saved_thought(update, context, result.text, path=result.path)
+        else:
+            await update.message.reply_text(result.text, reply_markup=cancel_keyboard())
+        return
     if await _maybe_reminder_custom(update, context, text):
         return
 
@@ -434,15 +589,16 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
     # --- Режимы ожидания: следующее сообщение — это содержание. -------------
     current = ui.mode(state)
     if current == ui.MODE_TASK:
-        result = ui.submit_task(state, text, vault=_vault(), sync=_sync_task)
-        await update.message.reply_text(
-            result.text, reply_markup=_keyboard(ui.keyboard_for(result)))
+        result = await asyncio.to_thread(ui.submit_task, state, text, vault=_vault(), sync=_sync_task)
+        await _reply_task_submission(update, context, result)
         return
 
     if current == ui.MODE_NOTE:
-        result = ui.submit_note(state, text, sync=_sync_note)
-        await update.message.reply_text(
-            result.text, reply_markup=_keyboard(ui.keyboard_for(result)))
+        result = await asyncio.to_thread(ui.submit_note, state, text, sync=_sync_note)
+        if result.ok:
+            await _reply_saved_thought(update, context, result.text, path=result.path)
+        else:
+            await update.message.reply_text(result.text, reply_markup=cancel_keyboard())
         return
 
     if current == ui.MODE_VIDEO:
@@ -515,9 +671,8 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
         return
     route = assistant_router.route(text)
     if route.kind == assistant_router.KIND_TASK:
-        result = ui.submit_task(state, route.subject, vault=_vault(), sync=_sync_task)
-        await update.message.reply_text(
-            result.text, reply_markup=_keyboard(ui.keyboard_for(result)))
+        result = await asyncio.to_thread(ui.submit_task, state, route.subject, vault=_vault(), sync=_sync_task)
+        await _reply_task_submission(update, context, result)
         return
 
     if route.kind == assistant_router.KIND_PERSONAL_SEARCH:
@@ -531,13 +686,13 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
         return
 
     # Всё неоднозначное безопасно сохраняется в Dusk Inbox.
-    line = append_to_inbox(text, "thought")
+    line = await asyncio.to_thread(append_to_inbox, " ".join(text.split()), "thought")
     if line:
         answer = "✅ Записал в Inbox. Потом можно открыть кнопкой «🧠 Мысли»."
-        hint = _related_hint(text)
+        hint = await asyncio.to_thread(_related_hint, text)
         if hint:
             answer += "\n\n" + hint
-        await update.message.reply_text(answer, reply_markup=MAIN_KEYBOARD)
+        await _reply_saved_thought(update, context, answer, line=line)
     else:
         await update.message.reply_text("Пустая запись — ничего не сохранил.",
                                         reply_markup=MAIN_KEYBOARD)
@@ -553,6 +708,8 @@ async def _handle_thought_callback(update: Update, context: ContextTypes.DEFAULT
     parts = data.split(":", 2)
     action = parts[1] if len(parts) > 1 else ""
     token = parts[2] if len(parts) > 2 else ""
+    if action != "z":
+        _clear_inputs(state)
 
     if action == "i":
         view = ui.render_thoughts(state, _vault(), store=store, now=now,
@@ -568,9 +725,19 @@ async def _handle_thought_callback(update: Update, context: ContextTypes.DEFAULT
         view = ui.next_thought(state, _vault(), store, token, now=now)
     elif action == "x":
         view = ui.hide_thought(state, store, token, now=now)
+    elif action == "e":
+        _clear_inputs(state)
+        view = await asyncio.to_thread(ui.begin_thought_edit, state, _vault(), token)
+    elif action == "d":
+        _clear_inputs(state)
+        view = await asyncio.to_thread(ui.confirm_thought_delete, state, _vault(), token)
+    elif action == "z":
+        view = await asyncio.to_thread(ui.delete_thought, state, _vault(), token, sync=_sync_note)
+    elif action == "u":
+        view = await asyncio.to_thread(ui.restore_thought, state, _vault(), token, sync=_sync_note)
     elif action == "t":
-        result = ui.task_from_thought(state, _vault(), token,
-                                      sync=_sync_task, now=now)
+        result = await asyncio.to_thread(ui.task_from_thought, state, _vault(), token,
+                                         sync=_sync_task, now=now)
         view = ui.render_thought(state, _vault(), store, token, now=now)
         if view.stale:
             view = ui.View(result.text, [[("⬅️ Назад", ui.THOUGHT_HUB)]], stale=True)
@@ -678,14 +845,17 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     state = context.user_data
     data = query.data or ""
     try:
+        if data.startswith("m:"):
+            await _remove_legacy_keyboard(update, context)
+            await _handle_menu_callback(update, context, data)
+            return
         if data == "x":
-            ui.cancel(state)
-            reminder_ui.clear_custom(state)
-            await ui.safe_edit(query, "Отменено.")
-            await query.message.reply_text("Главное меню.", reply_markup=MAIN_KEYBOARD)
+            _clear_inputs(state)
+            await ui.safe_edit(query, "Отменено. Что сделать?", MAIN_KEYBOARD)
             return
 
         if data == ui.THOUGHT_SEARCH:
+            _clear_inputs(state)
             # Поиск внутри хаба входит в тот же MODE_SEARCH, что и старая кнопка.
             ui.begin(state, ui.MODE_SEARCH)
             await ui.safe_edit(query, ui.MODE_PROMPTS[ui.MODE_SEARCH],
@@ -696,6 +866,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await _handle_thought_callback(update, context, data)
             return
 
+        _clear_inputs(state)
         if data.startswith("q:"):
             await _handle_focus_callback(update, context, data)
             return
@@ -747,20 +918,22 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not auth_check(update):
         return
-    ui.cancel(context.user_data)
-    reminder_ui.clear_custom(context.user_data)
+    await _remove_legacy_keyboard(update, context)
+    _clear_inputs(context.user_data)
     await update.message.reply_text("Отменено.", reply_markup=MAIN_KEYBOARD)
 
 
 async def handle_health(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not auth_check(update):
         return
+    await _remove_legacy_keyboard(update, context)
     await update.message.reply_text(health_text(), reply_markup=MAIN_KEYBOARD)
 
 
 async def handle_exit(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not auth_check(update):
         return
+    await _remove_legacy_keyboard(update, context)
     context.user_data["free_mode"] = False
     await update.message.reply_text("Режим вопросов выключен — снова пишу в Inbox.", reply_markup=MAIN_KEYBOARD)
 
@@ -768,6 +941,7 @@ async def handle_exit(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not auth_check(update):
         return
+    await _remove_legacy_keyboard(update, context)
     await update.message.reply_text("🎤 Расшифровываю…")
 
     voice = update.message.voice or update.message.audio
@@ -804,6 +978,7 @@ async def handle_voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not auth_check(update):
         return
+    await _remove_legacy_keyboard(update, context)
     await update.message.reply_text("📸 Смотрю скриншот…")
 
     photo = update.message.photo[-1]
@@ -854,7 +1029,7 @@ async def post_init(application: Application):
 
     async def deliver(notification):
         await application.bot.send_message(
-            chat_id=ALLOWED_USER, text=notification.text,
+            chat_id=ALLOWED_USER, text=notification.text, disable_notification=False,
             reply_markup=_notification_markup(notification))
 
     scheduler = focus_scheduler.FocusScheduler(
@@ -876,7 +1051,7 @@ async def post_init(application: Application):
 
     async def deliver_reminder(notification):
         await application.bot.send_message(
-            chat_id=ALLOWED_USER, text=notification.text,
+            chat_id=ALLOWED_USER, text=notification.text, disable_notification=False,
             reply_markup=_notification_markup(notification))
 
     reminder_sched = reminder_scheduler.ReminderScheduler(
@@ -941,6 +1116,7 @@ def main():
            .post_shutdown(post_shutdown)
            .build())
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("menu", handle_menu))
     app.add_handler(CommandHandler("cancel", handle_cancel))
     app.add_handler(CommandHandler("health", handle_health))
     app.add_handler(CommandHandler("exit", handle_exit))

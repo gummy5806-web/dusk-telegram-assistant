@@ -60,7 +60,9 @@
     {
       "path": "Board/Начать здесь.md",
       "source": "~/Documents/obsidian/my dusk/Board/Начать здесь.md",
-      "sha256": "1cb94c3cdd8e4b1fff1f584b4403820651ec013b81cf5ff37191f0d0713320a5"
+      "sha256": "87d4805c3bce5e3ecc005a0329566e7e1f8d78a1d0730407ae130c9680140514",
+      "initial_source_sha256": "1cb94c3cdd8e4b1fff1f584b4403820651ec013b81cf5ff37191f0d0713320a5",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": "CLAUDE.md",
@@ -230,7 +232,9 @@
     {
       "path": "bot/INTERFACE.md",
       "source": "~/Documents/obsidian/my dusk/bot/INTERFACE.md",
-      "sha256": "df11573573f247abd3c0abf05ef9dc825bcca226ab7bdfcae153fa1c20955e6e"
+      "sha256": "0b7a3d7b878fbc7b6db7c58d566a1cf98110f04fd1cfbff3a6295b451484a6d9",
+      "initial_source_sha256": "df11573573f247abd3c0abf05ef9dc825bcca226ab7bdfcae153fa1c20955e6e",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": "bot/RESEARCH-BRIDGE.md",
@@ -280,7 +284,9 @@
     {
       "path": "bot/dispatch.py",
       "source": "~/Documents/obsidian/my dusk/bot/dispatch.py",
-      "sha256": "38ee85ca0774a8997a86a3926c81e18f9f7cad64c6f03bac695c9fefa83e6b46"
+      "sha256": "89e1ba55ddaae51cc7eb65b6681f8d8bea1f8548121a5d9db109ade3cdc71a3b",
+      "initial_source_sha256": "38ee85ca0774a8997a86a3926c81e18f9f7cad64c6f03bac695c9fefa83e6b46",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": "bot/focus.py",
@@ -310,7 +316,9 @@
     {
       "path": "bot/inbox_core.py",
       "source": "~/Documents/obsidian/my dusk/bot/inbox_core.py",
-      "sha256": "aa6071138d478e18bbd18b1003cc18e6f37f80560fb1601281b492b9f2187310"
+      "sha256": "78d7b3c7b9e6ad14042188412e48e1b4652d4a79a3a4ecf07a32dfd376d35c29",
+      "initial_source_sha256": "aa6071138d478e18bbd18b1003cc18e6f37f80560fb1601281b492b9f2187310",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": "bot/install_hooks.sh",
@@ -435,12 +443,16 @@
     {
       "path": "bot/task_ui.py",
       "source": "~/Documents/obsidian/my dusk/bot/task_ui.py",
-      "sha256": "4922d2e4015cdf8c01605da3604669b3f17cbb14dde69aa54bf6d9e794e938b4"
+      "sha256": "61cdb177d9855be73769167dcf9e67af765639e19c7e4b54e1d0eefb4ff248e0",
+      "initial_source_sha256": "4922d2e4015cdf8c01605da3604669b3f17cbb14dde69aa54bf6d9e794e938b4",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": "bot/telegram_bot.py",
       "source": "~/Documents/obsidian/my dusk/bot/telegram_bot.py",
-      "sha256": "aca3a7776b739113474e75636e5fb90aa167b018aa2580827e482750f81888cf"
+      "sha256": "5bfd05ff0288695cf58aab863af2fcd28c6871b7840b379ea57ddefef41c613d",
+      "initial_source_sha256": "aca3a7776b739113474e75636e5fb90aa167b018aa2580827e482750f81888cf",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": "bot/test_advance_dates.py",
@@ -475,7 +487,9 @@
     {
       "path": "bot/test_personal_assistant_flow.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_personal_assistant_flow.py",
-      "sha256": "b7eed59e5cc0efdd15f9f1f10b74aa10fca1aa23bca6a7c8cf3d4e8f63a41414"
+      "sha256": "895b4b08dc66c06662d65fc3e45f083f368b9568f26eb069332e70ebcb478d3d",
+      "initial_source_sha256": "b7eed59e5cc0efdd15f9f1f10b74aa10fca1aa23bca6a7c8cf3d4e8f63a41414",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": "bot/test_personal_assistant_router.py",
@@ -515,7 +529,9 @@
     {
       "path": "bot/test_reminder_transport_runtime.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_reminder_transport_runtime.py",
-      "sha256": "e9570dc5a345c18ce30e520fffb16197ecd2e41cc226402648e8dcc7647c7e47"
+      "sha256": "0b0aadb1d63ea746917379bdbfe4bbe4dfe84ee633ae3f9710dea4bf57f69b3c",
+      "initial_source_sha256": "e9570dc5a345c18ce30e520fffb16197ecd2e41cc226402648e8dcc7647c7e47",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": "bot/test_reminder_ui.py",
@@ -625,7 +641,9 @@
     {
       "path": "bot/test_telegram_reminders.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_telegram_reminders.py",
-      "sha256": "7e4237955a93b4bc7b3596f6b6ed1694184495bfdc6bd82a33337f646ee89eb3"
+      "sha256": "9ff56a6c608d201b3c41ff2c939d9c97933fc87e8738d2e8846174ea9bf6a9e9",
+      "initial_source_sha256": "7e4237955a93b4bc7b3596f6b6ed1694184495bfdc6bd82a33337f646ee89eb3",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": "bot/test_telegram_status.py",
@@ -635,7 +653,9 @@
     {
       "path": "bot/test_telegram_ux.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_telegram_ux.py",
-      "sha256": "5f4196c05a03ff2294e12d376d0aa71482a872178626be68cb34853c5b2a16cf"
+      "sha256": "59fd294b19d89ae4dc2dbc093741356892b2a9fa7db48acf2bbffb69af6c7a5c",
+      "initial_source_sha256": "5f4196c05a03ff2294e12d376d0aa71482a872178626be68cb34853c5b2a16cf",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": "bot/test_telegram_ux_pass2.py",
@@ -660,7 +680,9 @@
     {
       "path": "bot/test_thought_telegram.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_thought_telegram.py",
-      "sha256": "6a1b9a0a8faa7e3b6e235975e4b9a610ffa2eb474c45805e2e03da4e5c68b95a"
+      "sha256": "7d6a2de5251c536c4459895f085d29ef40e6d25c5eeec0181c8b15349111c77b",
+      "initial_source_sha256": "6a1b9a0a8faa7e3b6e235975e4b9a610ffa2eb474c45805e2e03da4e5c68b95a",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": "bot/test_weekly_plan.py",
@@ -730,7 +752,9 @@
     {
       "path": "Пульт.md",
       "source": "~/Documents/obsidian/my dusk/Пульт.md",
-      "sha256": "af4fe84b96d195ff575bb154da29d01a6f142b3a38a717240e6b27c313096383"
+      "sha256": "28165cece6edeee71fd605029f9f978dd4f05827d42609c2b2ce90227319b5af",
+      "initial_source_sha256": "af4fe84b96d195ff575bb154da29d01a6f142b3a38a717240e6b27c313096383",
+      "updated": "2026-10-09 chat-controls"
     },
     {
       "path": ".obsidian/plugins/kanban-bases-view/main.js",
@@ -949,5 +973,11 @@
     "logs and runtime databases",
     "venv, build caches and binary apps",
     "BTT database"
+  ],
+  "updates": [
+    {
+      "date": "2026-10-09",
+      "description": "Inline chat controls, exact thought correction and reversible delete/restore; initial source digests retained per file."
+    }
   ]
 }

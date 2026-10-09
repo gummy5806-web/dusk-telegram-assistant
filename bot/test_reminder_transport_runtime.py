@@ -62,6 +62,9 @@ class FakeUI:
     SCREEN_MAIN = "main"
     SCREEN_CANCEL = "cancel"
 
+    def thought_edit_pending(self, state):
+        return False
+
     def mode(self, state):
         return ""
 
@@ -138,7 +141,7 @@ class TransportBase(unittest.IsolatedAsyncioTestCase):
             "logger": types.SimpleNamespace(
                 error=lambda *a, **k: None, warning=lambda *a, **k: None),
         }
-        for name in ("_maybe_reminder_custom", "_maybe_reminder_intent",
+        for name in ("_maybe_menu_reminder", "_maybe_reminder_custom", "_maybe_reminder_intent",
                      "handle_content"):
             load_function(TELEGRAM, name, namespace)
         self.namespace = namespace

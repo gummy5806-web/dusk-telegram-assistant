@@ -57,7 +57,8 @@ class ContentContractTests(unittest.TestCase):
 
     def test_main_buttons_clear_custom(self) -> None:
         body = function_source(TELEGRAM, "handle_text")
-        self.assertIn("reminder_ui.clear_custom", body)
+        self.assertIn("_clear_inputs", body)
+        self.assertIn("reminder_ui.clear_custom", function_source(TELEGRAM, "_clear_inputs"))
 
 
 class LifecycleContractTests(unittest.TestCase):

@@ -67,6 +67,7 @@ class WriteResult:
     mutated: bool = False
     kind: str = ""
     private: bool = False
+    path: str = ""
 
 
 def _to_private(text: str) -> str:
@@ -444,7 +445,8 @@ def save_note_result(text: str) -> WriteResult:
         if looks_private(text):
             return WriteResult(_to_private(text), mutated=True,
                                kind="private", private=True)
-        return WriteResult(_to_note(text, "note"), mutated=True, kind="note")
+        message, path = _to_note_with_path(text, "note")
+        return WriteResult(message, mutated=True, kind="note", path=path)
 
 
 def save_note(text: str) -> str:
@@ -466,6 +468,10 @@ def save_video(url: str) -> str:
 
 
 def _to_note(text: str, kind: str = "note") -> str:
+    return _to_note_with_path(text, kind)[0]
+
+
+def _to_note_with_path(text: str, kind: str = "note") -> tuple[str, str]:
     import zettel
     path = zettel.make_fleeting(
         text=text,
@@ -475,7 +481,11 @@ def _to_note(text: str, kind: str = "note") -> str:
         writer=_write_task,
     )
     label = "Ссылка" if kind == "link" else "Заметка"
-    return f"{label} сохранена → ZETA/FLEETING_DAILY\n{path.stem}"
+    try:
+        relative = path.relative_to(VAULT).as_posix()
+    except ValueError:
+        relative = ""
+    return f"{label} сохранена → ZETA/FLEETING_DAILY\n{path.stem}", relative
 
 
 @contextmanager

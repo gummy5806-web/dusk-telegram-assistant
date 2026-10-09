@@ -92,7 +92,8 @@ class MainKeyboardTests(unittest.TestCase):
         src = (BOT / "telegram_bot.py").read_text(encoding="utf-8")
         self.assertIn("task_ui", src)
         self.assertIn("MAIN_BUTTONS", src)
-        self.assertIn("ReplyKeyboardMarkup", src)
+        self.assertIn("InlineKeyboardMarkup", src)
+        self.assertIn("ReplyKeyboardRemove", src)
 
     def test_start_explains_button_then_content(self) -> None:
         src = (BOT / "telegram_bot.py").read_text(encoding="utf-8")

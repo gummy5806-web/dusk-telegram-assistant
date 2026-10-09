@@ -16,6 +16,11 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
+import hashlib
+import os
+import tempfile
+from contextlib import contextmanager, suppress
 from datetime import datetime
 from pathlib import Path
 
@@ -89,26 +94,63 @@ def append_raw(inbox_path, line: str, kind: str = "thought",
 
 def _insert(path: Path, line: str, heading: str, default_body: str) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
-    if not path.exists():
-        path.write_text(default_body, encoding="utf-8")
+    with locked_write(path):
+        if not path.exists():
+            _atomic_write(path, default_body)
 
-    lines = path.read_text(encoding="utf-8").splitlines()
+        lines = path.read_text(encoding="utf-8").splitlines()
 
-    try:
-        idx = next(i for i, l in enumerate(lines) if l.strip() == heading)
-    except StopIteration:
-        lines += ["", heading]
-        idx = len(lines) - 1
+        try:
+            idx = next(i for i, l in enumerate(lines) if l.strip() == heading)
+        except StopIteration:
+            lines += ["", heading]
+            idx = len(lines) - 1
 
-    insert_at = idx + 1
-    while insert_at < len(lines) and not lines[insert_at].startswith("## "):
-        insert_at += 1
-    while insert_at - 1 > idx and lines[insert_at - 1].strip() == "":
-        insert_at -= 1
+        insert_at = idx + 1
+        while insert_at < len(lines) and not lines[insert_at].startswith("## "):
+            insert_at += 1
+        while insert_at - 1 > idx and lines[insert_at - 1].strip() == "":
+            insert_at -= 1
 
-    lines.insert(insert_at, line)
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        lines.insert(insert_at, line)
+        _atomic_write(path, "\n".join(lines) + "\n")
     return line
+
+
+@contextmanager
+def locked_write(path: str | Path):
+    """Exclusive per-file lock shared by Inbox capture and thought mutations."""
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    key = hashlib.sha256(str(target.resolve()).encode("utf-8")).hexdigest()
+    lock = Path(tempfile.gettempdir()) / f"dusk-write-{os.getuid()}-{key}.lock"
+    descriptor = os.open(lock, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    with os.fdopen(descriptor, "a", encoding="utf-8") as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
+def atomic_write(path: str | Path, text: str) -> None:
+    """Replace a UTF-8 text file atomically. Caller owns any required lock."""
+    _atomic_write(Path(path), text)
+
+
+def _atomic_write(path: Path, text: str) -> None:
+    descriptor, temporary = tempfile.mkstemp(prefix="." + path.name + ".",
+                                           dir=str(path.parent))
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    except BaseException:
+        with suppress(FileNotFoundError):
+            os.unlink(temporary)
+        raise
 
 
 def vault_root() -> Path:

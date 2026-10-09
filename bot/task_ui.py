@@ -24,6 +24,7 @@ from pathlib import Path
 import frontmatter
 import queue_store
 import thought_feed
+import thought_mutations
 
 # ── Подписи главной клавиатуры ────────────────────────────────────────────
 # Цели пользователя, а не синтаксис. Старые подписи остаются константами-алиасами:
@@ -339,6 +340,9 @@ THOUGHT_SECTION_RECENT = "recent"
 THOUGHT_TOKEN_KEY = "thought_tokens"
 THOUGHT_LIST_KEY = "thought_list"
 THOUGHT_CURSOR_KEY = "thought_cursor"
+THOUGHT_EDIT_KEY = "thought_edit"
+THOUGHT_RESTORE_KEY = "thought_restore_tokens"
+THOUGHT_DELETE_CONFIRM_KEY = "thought_delete_confirm"
 
 THOUGHT_HUB = "f:h"
 THOUGHT_INBOX = "f:i"
@@ -401,6 +405,7 @@ def _thought_view(state, thought) -> "View":
     _remember_position(state, thought.identity)
     rows = [
         [("➡️ В задачу", f"f:t:{token}"), ("Следующая", f"f:n:{token}")],
+        [("✏️ Исправить", f"f:e:{token}"), ("🗑 Удалить", f"f:d:{token}")],
         [("Скрыть на 7 дней", f"f:x:{token}"), ("⬅️ Назад", THOUGHT_HUB)],
     ]
     return View(thought_feed.render_thought(thought), rows)
@@ -469,6 +474,138 @@ def render_thought(state, vault, store, token, now=None) -> "View":
     if thought is None:
         return _stale_thought()
     return _thought_view(state, thought)
+
+
+def saved_thought_view(state, vault, path="", line="") -> "View":
+    """Open the exact thought just captured, never a guessed "latest" record.
+
+    ``path`` may also be an Inbox identity returned by ``submit_thought_edit``;
+    this lets the transport use one result field for both allowed sources.
+    """
+    identity = ""
+    if line:
+        identity = thought_feed._identity_text(thought_feed.INBOX_REL,
+                                               str(line).strip())
+    elif isinstance(path, str) and "#" in path:
+        identity = path
+    elif path:
+        wanted = str(path).replace("\\", "/")
+        root = Path(vault)
+        candidate = root / wanted
+        if thought_feed._allowed_structured(root, candidate):
+            raw = thought_feed._safe_read(root, candidate)
+            if raw is not None:
+                identity = thought_feed._identity_text(wanted, raw)
+    thought = thought_feed.load_thought(vault, identity) if identity else None
+    if thought is None:
+        return _stale_thought()
+    return _thought_view(state, thought)
+
+
+def thought_edit_pending(state) -> bool:
+    pending = state.get(THOUGHT_EDIT_KEY) if isinstance(state, dict) else None
+    return isinstance(pending, str) and bool(pending)
+
+
+def clear_thought_edit(state) -> None:
+    if isinstance(state, dict):
+        state.pop(THOUGHT_EDIT_KEY, None)
+
+
+def clear_thought_delete(state) -> None:
+    """Revoke one delete confirmation when the user cancels or navigates away."""
+    if isinstance(state, dict):
+        state.pop(THOUGHT_DELETE_CONFIRM_KEY, None)
+
+
+def begin_thought_edit(state, vault, token) -> "View":
+    """Enter bounded correction mode after re-checking the callback identity."""
+    identity = resolve_thought_token(state, token)
+    text = thought_mutations.full_text(vault, identity) if identity else ""
+    if not text:
+        clear_thought_edit(state)
+        return _stale_thought()
+    state[THOUGHT_EDIT_KEY] = identity
+    shown = text if len(text) <= 3500 else text[:3499].rstrip() + "…"
+    return View("✏️ Исправление мысли\n\nТекущий текст:\n" + shown +
+                "\n\nПришли новый полный текст одним сообщением.",
+                [[("⬅️ Отмена", f"f:o:{token}")]])
+
+
+def submit_thought_edit(state, vault, text, sync=None) -> Submission:
+    identity = state.get(THOUGHT_EDIT_KEY) if isinstance(state, dict) else ""
+    if not isinstance(identity, str) or not identity:
+        return Submission(False, "⚠️ Режим исправления устарел.", False)
+    result = thought_mutations.edit(vault, identity, text)
+    if not result.ok:
+        if "устарела" in result.message:
+            clear_thought_edit(state)
+        return Submission(False, result.message, False)
+    clear_thought_edit(state)
+    if result.mutated and sync is not None:
+        sync()
+    # For Inbox the immutable, exact identity is the only safe "path" value.
+    return Submission(True, result.message, bool(result.mutated),
+                      result.identity if result.kind == "inbox" else result.path)
+
+
+def confirm_thought_delete(state, vault, token) -> "View":
+    identity = resolve_thought_token(state, token)
+    thought = thought_feed.load_thought(vault, identity) if identity else None
+    if thought is None:
+        return _stale_thought()
+    state[THOUGHT_DELETE_CONFIRM_KEY] = (token, identity)
+    return View("🗑 Удалить мысль? Она попадёт в корзину, откуда её можно восстановить.",
+                [[("🗑 Удалить", f"f:z:{token}"), ("⬅️ Отмена", f"f:o:{token}")]])
+
+
+def _restore_store(state) -> dict:
+    store = state.get(THOUGHT_RESTORE_KEY)
+    if not isinstance(store, dict):
+        store = {}
+        state[THOUGHT_RESTORE_KEY] = store
+    return store
+
+
+def _issue_restore_token(state, backup: str) -> str:
+    store = _restore_store(state)
+    token = _new_token()
+    while token in store:
+        token = _new_token()
+    store[token] = backup
+    while len(store) > MAX_TOKENS:
+        store.pop(next(iter(store)))
+    return token
+
+
+def delete_thought(state, vault, token, sync=None) -> "View":
+    identity = resolve_thought_token(state, token)
+    confirmation = state.get(THOUGHT_DELETE_CONFIRM_KEY)
+    if confirmation != (token, identity):
+        return View("⚠️ Сначала подтверди удаление мысли.",
+                    [[("⬅️ Назад", THOUGHT_HUB)]], stale=True)
+    clear_thought_delete(state)
+    result = thought_mutations.delete(vault, identity) if identity else None
+    if result is None or not result.ok:
+        return View(result.message if result else "⚠️ Мысль устарела — открой «🧠 Мысли» заново.",
+                    [[("⬅️ Назад", THOUGHT_HUB)]], stale=True)
+    if result.mutated and sync is not None:
+        sync()
+    return View(result.message,
+                [[("↩️ Восстановить", f"f:u:{result.backup}"),
+                  ("⬅️ Назад", THOUGHT_HUB)]])
+
+
+def restore_thought(state, vault, token, sync=None) -> "View":
+    backup = (token or "").strip()
+    result = thought_mutations.restore(vault, backup)
+    if not result.ok:
+        return View(result.message, [[("⬅️ Назад", THOUGHT_HUB)]], stale=True)
+    if result.mutated and sync is not None:
+        sync()
+    thought = thought_feed.load_thought(vault, result.identity)
+    return _thought_view(state, thought) if thought else View(result.message,
+                                                               [[("⬅️ Назад", THOUGHT_HUB)]])
 
 
 def next_thought(state, vault, store, token, now=None) -> "View":
@@ -723,7 +860,8 @@ def submit_note(state, raw_text, save=None, sync=None) -> Submission:
     changed = bool(getattr(result, "mutated", False))
     if changed and sync is not None:
         sync()
-    return Submission(True, message, changed)
+    path = getattr(result, "path", "") or getattr(result, "identity", "") or ""
+    return Submission(True, message, changed, str(path))
 
 
 def submit_video(state, raw_text, enqueue=None, sync=None) -> Submission:

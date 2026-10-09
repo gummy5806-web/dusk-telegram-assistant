@@ -365,6 +365,9 @@ class _FakeUI:
     SCREEN_MAIN = task_ui.SCREEN_MAIN
     SCREEN_CANCEL = task_ui.SCREEN_CANCEL
 
+    def thought_edit_pending(self, state):
+        return False
+
     def mode(self, state):
         return ""
 
@@ -387,8 +390,12 @@ class CaptureConfirmationTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_confirmation_when_related_hint_is_silent(self) -> None:
         appended = []
+        async def reply_saved(update, context, text, path="", line=""):
+            await update.message.reply_text(text)
+
         namespace = {
             "re": __import__("re"),
+            "asyncio": __import__("asyncio"),
             "ui": _FakeUI(),
             "assistant_router": __import__("assistant_router"),
             "personal_search": __import__("personal_search"),
@@ -401,6 +408,8 @@ class CaptureConfirmationTests(unittest.IsolatedAsyncioTestCase):
             "append_to_inbox": lambda text, kind="thought", private=False: (
                 appended.append(text) or "line"),
             "_related_hint": lambda text: "",
+            "_maybe_menu_reminder": _no_reminder,
+            "_reply_saved_thought": reply_saved,
             "_maybe_reminder_custom": _no_reminder,
             "_maybe_reminder_intent": _no_reminder,
             "_vault": lambda: Path("/nowhere"),
