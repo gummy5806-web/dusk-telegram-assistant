@@ -33,6 +33,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+import thought_status
 import frontmatter
 
 INBOX_REL = "ZETA/FLEETING/00 Инбокс.md"
@@ -251,7 +252,7 @@ def _allowed_structured(root: Path, path: Path) -> bool:
     return resolved.parent == resolved_base
 
 
-def _structured_thoughts(root: Path):
+def _structured_thoughts(root: Path, include_done=False):
     """Все структурированные заметки, свежие первыми. Только чтение."""
     base = _fleet_dir(root)
     if base is None:
@@ -271,8 +272,11 @@ def _structured_thoughts(root: Path):
         except ValueError:
             continue
         date = _parse_date(frontmatter.get(text, "created")) or _filename_date(path)
+        identity = _identity_text(relative, text)
+        if not include_done and thought_status.is_done(root, identity):
+            continue
         thoughts.append(Thought(
-            identity=_identity_text(relative, text),
+            identity=identity,
             path=relative,
             title=_title(text, path),
             excerpt=_excerpt(body),
@@ -349,21 +353,25 @@ def inbox_counts(root=None) -> InboxCounts:
     if text is None:
         raise InboxReadError("Inbox существует, но безопасно не читается")
     sections = _parse_inbox_sections(text)
-    thoughts = len(sections["thoughts"])
+    thoughts = sum(not thought_status.is_done(vault, _identity_text(INBOX_REL, line))
+                   for _stamp, _body, line in sections["thoughts"])
     tasks = len(sections["tasks"])
     links = len(sections["links"])
     return InboxCounts(thoughts + tasks + links, thoughts, tasks, links)
 
 
-def _inbox_thoughts(root: Path):
+def _inbox_thoughts(root: Path, include_done=False):
     path = root / INBOX_REL
     text = _safe_read(root, path)
     if text is None:
         return []
     thoughts = []
     for stamp, body, line in _parse_inbox(text):
+        identity = _identity_text(INBOX_REL, line)
+        if not include_done and thought_status.is_done(root, identity):
+            continue
         thoughts.append(Thought(
-            identity=_identity_text(INBOX_REL, line),
+            identity=identity,
             path=INBOX_REL,
             title=_clip(body, MAX_TITLE),
             excerpt=_clip(body),
@@ -385,7 +393,25 @@ def _inbox_total(root: Path) -> int:
     text = _safe_read(root, path)
     if text is None:
         return 0
-    return len(_parse_inbox(text))
+    return sum(not thought_status.is_done(root, _identity_text(INBOX_REL, line))
+               for _stamp, _body, line in _parse_inbox(text))
+
+
+def completed_thoughts(root=None, limit=MAX_STRUCTURED_RECENT):
+    """Resolved captures are still accessible and may be reopened."""
+    vault = _root(root)
+    items = list(reversed(_inbox_thoughts(vault, include_done=True))) + _sorted_recent(
+        _structured_thoughts(vault, include_done=True))
+    completed = []
+    for item in items:
+        try:
+            if thought_status.get_done(vault, item.identity):
+                completed.append(item)
+        except thought_status.StatusError:
+            continue
+        if len(completed) >= max(1, int(limit)):
+            break
+    return completed
 
 
 def _recently_surfaced(store, identity: str, now) -> bool:
@@ -451,7 +477,7 @@ def load_thought(root=None, identity=None):
         return None
 
     if relative == INBOX_REL:
-        for thought in _inbox_thoughts(vault):
+        for thought in _inbox_thoughts(vault, include_done=True):
             if thought.identity == key:
                 return thought
         return None

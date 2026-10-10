@@ -53,6 +53,25 @@ class DigestTransportTests(unittest.IsolatedAsyncioTestCase):
         capture.assert_not_awaited()
         self.assertEqual(ui.mode(self.state), '')
 
+    async def test_thought_completion_and_reopening_callbacks_are_wired(self):
+        daily = self.vault/'ZETA/FLEETING_DAILY'; daily.mkdir(parents=True)
+        p = daily/'2026-10-01 — Idea.md'; p.write_text('---\ncreated: 2026-10-01\n---\n# Idea\n\nидея')
+        import thought_feed, thought_status
+        identity = thought_feed._identity_text(p.relative_to(self.vault).as_posix(), p.read_text())
+        token = ui.issue_thought_token(self.state, identity)
+        with patch.object(bot, '_runtime_store', return_value=None), patch.object(bot, '_sync_note') as sync:
+            self.query.data = 'f:c:'+token
+            await bot.handle_callback(self.update, self.context)
+            self.assertTrue(thought_status.is_done(self.vault, identity))
+            self.assertIn('Сделано', self.query.edit_message_text.call_args.args[0])
+            self.query.data = 'f:a'
+            await bot.handle_callback(self.update, self.context)
+            self.assertIn('Сделанные', self.query.edit_message_text.call_args.args[0])
+            self.query.data = 'f:b:'+token
+            await bot.handle_callback(self.update, self.context)
+            self.assertFalse(thought_status.is_done(self.vault, identity))
+            self.assertEqual(sync.call_count, 2)
+
     async def test_picker_clears_modes(self):
         ui.begin(self.state,ui.MODE_NOTE)
         self.query.data='m:digest'

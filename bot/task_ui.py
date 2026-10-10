@@ -24,6 +24,7 @@ from pathlib import Path
 import frontmatter
 import queue_store
 import thought_feed
+import thought_status
 import thought_mutations
 
 # ── Подписи главной клавиатуры ────────────────────────────────────────────
@@ -348,6 +349,7 @@ THOUGHT_HUB = "f:h"
 THOUGHT_INBOX = "f:i"
 THOUGHT_RECENT = "f:r"
 THOUGHT_REMEMBER = "f:w"
+THOUGHT_DONE = "f:a"
 THOUGHT_SEARCH = "f:s"
 
 THOUGHT_LIST_SIZE = 8
@@ -400,11 +402,20 @@ def _remember_position(state, identity: str) -> None:
     state[THOUGHT_CURSOR_KEY] = identities.index(identity)
 
 
-def _thought_view(state, thought) -> "View":
+def _thought_view(state, thought, vault) -> "View":
     token = issue_thought_token(state, thought.identity)
     _remember_position(state, thought.identity)
+    try:
+        done = thought_status.get_done(vault, thought.identity)
+    except thought_status.StatusError:
+        return View("⚠️ Отметка мысли недоступна — попробуй позже.",
+                    [[("⬅️ Назад", THOUGHT_HUB)]], stale=True)
+    if done:
+        return View("✅ Сделано · сохранено\n\n" + thought_feed.render_thought(thought),
+                    [[("↩️ Вернуть в активные", f"f:b:{token}"), ("⬅️ Назад", THOUGHT_DONE)]])
     rows = [
-        [("➡️ В задачу", f"f:t:{token}"), ("Следующая", f"f:n:{token}")],
+        [("✅ Сделано", f"f:c:{token}"), ("Следующая", f"f:n:{token}")],
+        [("➡️ В задачу", f"f:t:{token}")],
         [("✏️ Исправить", f"f:e:{token}"), ("🗑 Удалить", f"f:d:{token}")],
         [("Скрыть на 7 дней", f"f:x:{token}"), ("⬅️ Назад", THOUGHT_HUB)],
     ]
@@ -415,13 +426,19 @@ def _hub_rows() -> list:
     return [
         [("📥 Inbox", THOUGHT_INBOX), ("🆕 Последние", THOUGHT_RECENT)],
         [("💡 Вспомнить", THOUGHT_REMEMBER), ("🔎 Найти", THOUGHT_SEARCH)],
-        [("💡 Разбор мыслей", "m:digest")],
+        [("📁 Сделанные", THOUGHT_DONE), ("💡 Разбор мыслей", "m:digest")],
     ]
 
 
 def render_thoughts(state, vault, store=None, now=None,
                    section: str = THOUGHT_SECTION_OVERVIEW) -> "View":
     """Один ограниченный экран хаба: обзор, Inbox или последние заметки."""
+    if section == "done":
+        items = thought_feed.completed_thoughts(vault, limit=THOUGHT_LIST_SIZE)
+        state[THOUGHT_LIST_KEY] = [thought.identity for thought in items]
+        return View(thought_feed.render_list(items, "📁 Сделанные мысли"),
+                    _section_rows(state, items))
+
     if section == THOUGHT_SECTION_INBOX:
         items = thought_feed.inbox_thoughts(
             vault, limit=THOUGHT_LIST_SIZE)
@@ -455,7 +472,7 @@ def remember_thought(state, vault, store=None, now=None) -> "View":
     state[THOUGHT_LIST_KEY] = [thought.identity]
     if store is not None:
         store.record_surface(thought.identity, now=now)
-    return _thought_view(state, thought)
+    return _thought_view(state, thought, vault)
 
 
 def _section_rows(state, items) -> list:
@@ -474,7 +491,7 @@ def render_thought(state, vault, store, token, now=None) -> "View":
     thought = thought_feed.load_thought(vault, identity) if identity else None
     if thought is None:
         return _stale_thought()
-    return _thought_view(state, thought)
+    return _thought_view(state, thought, vault)
 
 
 def saved_thought_view(state, vault, path="", line="") -> "View":
@@ -500,7 +517,7 @@ def saved_thought_view(state, vault, path="", line="") -> "View":
     thought = thought_feed.load_thought(vault, identity) if identity else None
     if thought is None:
         return _stale_thought()
-    return _thought_view(state, thought)
+    return _thought_view(state, thought, vault)
 
 
 def thought_edit_pending(state) -> bool:
@@ -605,26 +622,73 @@ def restore_thought(state, vault, token, sync=None) -> "View":
     if result.mutated and sync is not None:
         sync()
     thought = thought_feed.load_thought(vault, result.identity)
-    return _thought_view(state, thought) if thought else View(result.message,
+    return _thought_view(state, thought, vault) if thought else View(result.message,
                                                                [[("⬅️ Назад", THOUGHT_HUB)]])
 
 
-def next_thought(state, vault, store, token, now=None) -> "View":
-    """Следующий кандидат в текущем разделе; в конце список зацикливается."""
+def complete_thought(state, vault, token, sync=None) -> "View":
+    return _set_thought_done(state, vault, token, True, sync)
+
+
+def reopen_thought(state, vault, token, sync=None) -> "View":
+    return _set_thought_done(state, vault, token, False, sync)
+
+
+def _set_thought_done(state, vault, token, done, sync) -> "View":
     identity = resolve_thought_token(state, token)
-    identities = state.get(THOUGHT_LIST_KEY)
-    if not isinstance(identities, list) or not identities:
-        return _stale_thought()
-    try:
-        index = identities.index(identity)
-    except ValueError:
-        index = int(state.get(THOUGHT_CURSOR_KEY, 0))
-    next_index = (index + 1) % len(identities)
-    thought = thought_feed.load_thought(vault, identities[next_index])
+    thought = thought_feed.load_thought(vault, identity) if identity else None
     if thought is None:
         return _stale_thought()
-    state[THOUGHT_CURSOR_KEY] = next_index
-    return _thought_view(state, thought)
+    try:
+        changed = thought_status.set_done(vault, identity, done)
+    except thought_status.StatusError:
+        return View("⚠️ Не смог сохранить отметку — попробуй позже.",
+                    [[("⬅️ Назад", THOUGHT_HUB)]], stale=True)
+    if changed and sync is not None:
+        sync()
+    return _thought_view(state, thought, vault)
+
+
+def next_thought(state, vault, store, token, now=None) -> "View":
+    """Advance to another live active thought; never loop a singleton into itself."""
+    identity = resolve_thought_token(state, token)
+    if not identity:
+        return _stale_thought()
+    identities = state.get(THOUGHT_LIST_KEY)
+    identities = list(identities) if isinstance(identities, list) else [identity]
+    index = identities.index(identity) if identity in identities else -1
+    ordered = identities[index + 1:] + identities[:max(index, 0)]
+    fresh = []
+    if store is not None:
+        forgotten = thought_feed.forgotten_thought(vault, store, now)
+        if forgotten is not None:
+            fresh.append(forgotten)
+    fresh.extend(thought_feed.inbox_thoughts(vault, limit=THOUGHT_LIST_SIZE))
+    fresh.extend(thought_feed.recent_thoughts(vault, limit=THOUGHT_LIST_SIZE))
+    ordered += [thought.identity for thought in fresh]
+    seen = {identity}
+    for candidate in ordered:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        if thought_status.is_done(vault, candidate):
+            continue
+        if store is not None and store.is_hidden(candidate, now=now):
+            continue
+        thought = thought_feed.load_thought(vault, candidate)
+        if thought is None:
+            continue
+        state[THOUGHT_LIST_KEY] = list(dict.fromkeys(identities + [item.identity for item in fresh]))
+        if store is not None:
+            store.record_surface(candidate, now=now)
+        return _thought_view(state, thought, vault)
+    thought = thought_feed.load_thought(vault, identity)
+    if thought is None:
+        return View("Других мыслей пока нет. Открой Inbox или добавь новую запись.",
+                    [[("⬅️ Назад", THOUGHT_HUB)]])
+    view = _thought_view(state, thought, vault)
+    rows = [[button for button in row if button[1] != f"f:n:{token}"] for row in view.rows]
+    return View(view.text + "\n\nДругих мыслей пока нет.", [row for row in rows if row])
 
 
 def hide_thought(state, store, token, now=None) -> "View":

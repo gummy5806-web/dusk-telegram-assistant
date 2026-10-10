@@ -861,6 +861,12 @@ async def _handle_thought_callback(update: Update, context: ContextTypes.DEFAULT
         view = ui.remember_thought(state, _vault(), store=store, now=now)
     elif action == "o":
         view = ui.render_thought(state, _vault(), store, token, now=now)
+    elif action == "a":
+        view = ui.render_thoughts(state, _vault(), store=store, now=now, section="done")
+    elif action == "c":
+        view = await asyncio.to_thread(ui.complete_thought, state, _vault(), token, sync=_sync_note)
+    elif action == "b":
+        view = await asyncio.to_thread(ui.reopen_thought, state, _vault(), token, sync=_sync_note)
     elif action == "n":
         view = ui.next_thought(state, _vault(), store, token, now=now)
     elif action == "x":

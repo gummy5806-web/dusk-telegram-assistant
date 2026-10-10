@@ -18,6 +18,8 @@ import os
 import re
 from pathlib import Path
 
+import thought_feed
+import thought_status
 import inbox_core
 import llm
 import someday
@@ -183,6 +185,8 @@ def run_triage(limit: int = MAX_ITEMS) -> str:
     entries = []
     for i, l in enumerate(lines):
         if l.startswith("- "):
+            if thought_status.is_done(vault, thought_feed._identity_text("ZETA/FLEETING/00 Инбокс.md", l.strip())):
+                continue
             text = re.sub(r"^- \*\*\d{2}:\d{2}\*\*\s*", "", l).strip()
             if text:
                 entries.append((i, l, text))
