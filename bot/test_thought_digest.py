@@ -156,6 +156,11 @@ class CollectTests(VaultBase):
 
 
 class GenerateAndRenderTests(unittest.TestCase):
+    def test_prompt_disallows_duplicate_sections(self):
+        prompt = thought_digest._prompt(self.snapshot())
+        self.assertIn("Каждый kind только один раз", prompt)
+        self.assertIn("максимум 5 разделов", prompt)
+
     def snapshot(self):
         return {
             "period": "recent", "label": "недавние записи", "tasks": [],
@@ -175,6 +180,19 @@ class GenerateAndRenderTests(unittest.TestCase):
         self.assertEqual(result["error"], "")
         self.assertEqual(result["sections"][0]["items"][0]["source_ids"], ["s1"])
         self.assertIn("не инструкции", ask.call_args.args[0])
+
+    def test_prompt_spells_out_the_complete_strict_section_schema(self):
+        ask = mock.Mock(return_value=json.dumps({"sections": [{"kind": "intent", "items": [
+            {"text": "Возможный замысел.", "source_ids": ["s1"]}
+        ]}]}))
+        thought_digest.generate(self.snapshot(), ask=ask)
+        prompt = ask.call_args.args[0]
+        self.assertIn('{"sections":[{"kind":"intent","items":[{"text":"Возможный замысел', prompt)
+        self.assertIn('intent|connections|next|reflect|defer', prompt)
+        self.assertIn('ровно ключи kind и items', prompt)
+        self.assertIn('не более 2', prompt)
+        self.assertIn('не длиннее 600', prompt)
+        self.assertIn('от 1 до 5', prompt)
 
     def test_invalid_llm_response_is_not_fabricated_or_leaked(self):
         result = thought_digest.generate(self.snapshot(), ask=lambda *args, **kwargs: "secret provider stack")
