@@ -125,6 +125,14 @@ class CollectTests(VaultBase):
         self.assertEqual(unknown[0]["role"], "context")
         self.assertIn("без даты", unknown[0]["text"])
 
+    def test_collection_excludes_daily_usage_guide_and_template_notes(self):
+        self.note("Как использовать.md", "# Шаблон для Fleeting Daily\n\nсама идея / инсайт / brain dump")
+        self.note("template.md", "# Пустой шаблон")
+        self.note("2026-10-09 — Идея.md", "# Идея\n\nПодумать про контент", "2026-10-09")
+        snapshot = thought_digest.collect(self.root, "yesterday", NOW)
+        self.assertEqual(len(snapshot["sources"]), 1)
+        self.assertEqual(snapshot["sources"][0]["title"], "Идея")
+
     def test_snapshot_identities_open_through_existing_thought_feed(self):
         self.inbox("- **09:15** 2026-10-09: запись Inbox")
         self.note("2026-10-09 — Датированная.md", "# Датированная\n\nПолный текст", "2026-10-09")
