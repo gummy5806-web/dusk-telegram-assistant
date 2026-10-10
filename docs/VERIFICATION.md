@@ -47,3 +47,21 @@
 ## Разбор мыслей — 10 октября 2026
 
 1175/1175 Python tests на PTB 21.5, без skip. Из них 43 новых tests core/queue/transport/delivery. RED воспроизведён для отсутствующего интерфейса, cancellation и backlog; meaningful source-identity, created-time, malformed queue и concurrency regressions прошли. Read-only reviewer: ACCEPT после исправлений. Python compile/diff-check и LaunchAgent plist lint — PASS. Реальная модель, установка и доставка фиксируются в отдельной приёмке.
+
+
+## Финальная проверка thought-digest
+
+10 октября 2026: **1181/1181** tests PASS на Mac (PTB 21.5) и после установки
+на VPS (Python 3.10 / PTB 21.5). 95 tracked VPS Python modules compile PASS,
+17/17 installed hashes совпали на Mac и VPS; 855 tracked файлов вне итогового
+патча не изменились. `compileall`, `git diff --check`, plist lint PASS.
+
+Реальный UAT обнаружил нестабильность свободного JSON, поэтому только digest
+передаёт существующему Vertex SDK `response_mime_type=application/json` и
+`response_schema`; прочие вызовы модели сохраняют прежний интерфейс. Проверка
+ссылок/размеров не ослаблена. Дополнительная регрессия исключает guide/template.
+Последний реальный запрос дал корректные намерения, вопросы и отложенное;
+неясная расшифровка предложена к уточнению, старый deadline не стал новым.
+Основная реализация получила отдельный ACCEPT; последние API/prompt/guide
+поправки проверены Codex полным набором и реальными вызовами, без заявления
+о повторном независимом ревью. Итог доставки — в отдельной приёмке.

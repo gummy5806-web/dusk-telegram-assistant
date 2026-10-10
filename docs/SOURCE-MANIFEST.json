@@ -343,7 +343,9 @@
     {
       "path": "bot/llm.py",
       "source": "~/Documents/obsidian/my dusk/bot/llm.py",
-      "sha256": "f49470242a4fe056510b22936d23babc85f6cf8eefd09f956c9a6eefed60177e"
+      "sha256": "26ed098f6d0d58702f381e3ba4e1bff3c490505b4e209d91c401d636abe51e5e",
+      "initial_source_sha256": "f49470242a4fe056510b22936d23babc85f6cf8eefd09f956c9a6eefed60177e",
+      "updated": "2026-10-10 thought-digest"
     },
     {
       "path": "bot/market.py",
@@ -982,8 +984,9 @@
     {
       "date": "2026-10-10",
       "change": "thought-digest",
-      "tests": 1175,
-      "review": "ACCEPT"
+      "tests": 1181,
+      "review": "ACCEPT",
+      "final_correction": "Vertex structured output; Codex verification and real UAT"
     }
   ]
 }
