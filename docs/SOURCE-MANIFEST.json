@@ -452,9 +452,9 @@
     {
       "path": "bot/telegram_bot.py",
       "source": "~/Documents/obsidian/my dusk/bot/telegram_bot.py",
-      "sha256": "1e4cc6ba0cd47a555d72f300d1efdfd1cdb3ace60f4fa2ffbc242c6950b80e56",
+      "sha256": "278411711c0a0b565158d3f7bb194c1415338c2782aec495cfc43e803a242ea8",
       "initial_source_sha256": "aca3a7776b739113474e75636e5fb90aa167b018aa2580827e482750f81888cf",
-      "updated": "thought-digest-20261010"
+      "updated": "2026-10-10 capture-origin"
     },
     {
       "path": "bot/test_advance_dates.py",
@@ -987,6 +987,12 @@
       "tests": 1181,
       "review": "ACCEPT",
       "final_correction": "Vertex structured output; Codex verification and real UAT"
+    },
+    {
+      "date": "2026-10-10",
+      "change": "capture-origin",
+      "tests": 1186,
+      "verification": "Codex; live Mac/VPS read-only input checks; legacy button transport regression"
     }
   ]
 }

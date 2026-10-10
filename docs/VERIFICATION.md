@@ -65,3 +65,8 @@
 Основная реализация получила отдельный ACCEPT; последние API/prompt/guide
 поправки проверены Codex полным набором и реальными вызовами, без заявления
 о повторном независимом ревью. Итог доставки — в отдельной приёмке.
+
+
+## Исправление происхождения записей
+
+1186/1186 Mac/VPS PASS. 5 новых регрессий: source-only input, button exclusion, legacy button routing, multiline/code fence, empty capture. Реальные коллекции не содержат спорных записей/задач и агентских sections. Архив 4/4 SHA-256, установленный код 4/4 SHA-256; service active/NRestarts=0. См. docs/history/2026-10-10-capture-origin-fix.md.
