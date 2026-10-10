@@ -445,16 +445,16 @@
     {
       "path": "bot/task_ui.py",
       "source": "~/Documents/obsidian/my dusk/bot/task_ui.py",
-      "sha256": "128e634482f0387396c586ddd3a1ea7479b9ca5408ffeaf769e880ad5eff871b",
+      "sha256": "7cabcc8fbe3cd79f1eeb0243d148ccaed446e1580b9d32e3c5098a0cd5ac445f",
       "initial_source_sha256": "4922d2e4015cdf8c01605da3604669b3f17cbb14dde69aa54bf6d9e794e938b4",
-      "updated": "thought-digest-20261010"
+      "updated": "2026-10-10 thought-lifecycle"
     },
     {
       "path": "bot/telegram_bot.py",
       "source": "~/Documents/obsidian/my dusk/bot/telegram_bot.py",
-      "sha256": "278411711c0a0b565158d3f7bb194c1415338c2782aec495cfc43e803a242ea8",
+      "sha256": "00611a1f4976648bd310a7ca59be94c46b8e205117cd34e12785158f327c731a",
       "initial_source_sha256": "aca3a7776b739113474e75636e5fb90aa167b018aa2580827e482750f81888cf",
-      "updated": "2026-10-10 capture-origin"
+      "updated": "2026-10-10 thought-lifecycle"
     },
     {
       "path": "bot/test_advance_dates.py",
@@ -694,7 +694,9 @@
     {
       "path": "bot/thought_feed.py",
       "source": "~/Documents/obsidian/my dusk/bot/thought_feed.py",
-      "sha256": "91b06636049bc806b91f52e941bd13c356253dc71ec8d81b965fe2fd32e553d3"
+      "sha256": "c987da0101e41f6f18a0dd1fccc7ac2d7fed839320d8dbd7f6f9fe6a135fec1d",
+      "initial_source_sha256": "91b06636049bc806b91f52e941bd13c356253dc71ec8d81b965fe2fd32e553d3",
+      "updated": "2026-10-10 thought-lifecycle"
     },
     {
       "path": "bot/transcript_source.py",
@@ -704,7 +706,9 @@
     {
       "path": "bot/triage.py",
       "source": "~/Documents/obsidian/my dusk/bot/triage.py",
-      "sha256": "66b122774c0ad71ae3a0044a48af1a214da45766c392341b2a4a31b585fa73e1"
+      "sha256": "d4e941178a34e10cb4b7a3c0a3642360f53aa296a682eb10ce163ab8bc50ff78",
+      "initial_source_sha256": "66b122774c0ad71ae3a0044a48af1a214da45766c392341b2a4a31b585fa73e1",
+      "updated": "2026-10-10 thought-lifecycle"
     },
     {
       "path": "bot/triage_now.sh",
@@ -993,6 +997,12 @@
       "change": "capture-origin",
       "tests": 1186,
       "verification": "Codex; live Mac/VPS read-only input checks; legacy button transport regression"
+    },
+    {
+      "date": "2026-10-10",
+      "change": "thought-lifecycle",
+      "tests": 1196,
+      "verification": "Codex tests, installed VPS and read-only real card checks"
     }
   ]
 }

@@ -70,3 +70,8 @@
 ## Исправление происхождения записей
 
 1186/1186 Mac/VPS PASS. 5 новых регрессий: source-only input, button exclusion, legacy button routing, multiline/code fence, empty capture. Реальные коллекции не содержат спорных записей/задач и агентских sections. Архив 4/4 SHA-256, установленный код 4/4 SHA-256; service active/NRestarts=0. См. docs/history/2026-10-10-capture-origin-fix.md.
+
+
+## Thought lifecycle
+
+1196/1196 source/VPS PASS; 10 новых tests completion/reopen/navigation/state boundary/callbacks. Real read-only Mac/VPS card checks and 8/8 installed hashes PASS; service active/NRestarts=0. Details: docs/history/2026-10-10-thought-lifecycle.md.
