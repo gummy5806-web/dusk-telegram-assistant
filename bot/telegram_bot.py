@@ -49,6 +49,9 @@ import reminder_ui
 import reminder_scheduler
 import reminders
 import personal_summary
+import thought_digest
+import thought_digest_jobs
+from thought_digest_delivery import DeliveryLedger
 from vault_ops import (
     create_fleeting_note, append_to_inbox,
     get_pending_tasks, git_sync, git_push
@@ -72,7 +75,7 @@ MENU_ACTIONS = (
     ((ui.BTN_THOUGHT, "m:thought"), (ui.BTN_THOUGHTS, "m:thoughts")),
     ((ui.BTN_NEW_TASK, "m:new"), (ui.BTN_TASKS, "m:tasks")),
     ((MENU_REMINDER, "m:remind"), (ui.BTN_STATUS, "m:status")),
-    ((ui.BTN_MATERIAL, "m:material"),),
+    (("💡 Разбор мыслей", "m:digest"), (ui.BTN_MATERIAL, "m:material")),
 )
 
 
@@ -296,7 +299,9 @@ async def _handle_menu_callback(update, context, data):
         text = await asyncio.to_thread(_personal_status_text)
         await ui.safe_edit(query, text, MAIN_KEYBOARD)
         return
-    if action == "tasks":
+    if action == "digest":
+        view = _digest_period_view()
+    elif action == "tasks":
         view = await asyncio.to_thread(ui.render_list, state, _vault(), root=True)
     elif action == "thoughts":
         view = await asyncio.to_thread(ui.render_thoughts, state, _vault(),
@@ -319,6 +324,136 @@ async def _handle_menu_callback(update, context, data):
         await ui.safe_edit(query, "Кнопка устарела. Выбери действие.", MAIN_KEYBOARD)
         return
     await ui.safe_edit(query, view.text, _inline(view) or MAIN_KEYBOARD)
+
+
+_DIGEST_PERIODS = {"today": "сегодня", "yesterday": "вчера", "week": "за неделю", "recent": "последние мысли"}
+
+
+def _digest_period_view():
+    return ui.View("💡 Разбор мыслей\n\nСоберу, что ты хотел, связанные идеи, следующий шаг и вопросы.\nВыбери период. Выводы — предложения; записи сами не меняются.", [
+        [("Сегодня", "dg:p:today"), ("Вчера", "dg:p:yesterday")],
+        [("За неделю", "dg:p:week"), ("Последние", "dg:p:recent")],
+    ])
+
+
+def _sync_digest(job=None):
+    vault = _vault()
+    if job is not None:
+        path = vault / "SYSTEM/THOUGHT_DIGEST/requests" / (job["id"] + ".json")
+        if not thought_digest_jobs.sync_file(vault, path, message="thought digest: request"):
+            raise RuntimeError("Digest synchronization unavailable")
+        return
+    # Retry a locally saved request if its first push failed, then fetch results.
+    requests = thought_digest_jobs.requests(vault, limit=2000)
+    if not requests:
+        return
+    for request in requests:
+        if thought_digest_jobs.get_result(vault, request["id"]) is None:
+            path = vault / "SYSTEM/THOUGHT_DIGEST/requests" / (request["id"] + ".json")
+            if not thought_digest_jobs.sync_file(vault, path, message="thought digest: request"):
+                raise RuntimeError("Digest synchronization unavailable")
+            break
+    else:
+        import subprocess
+        completed = subprocess.run(["git", "pull", "--rebase", "--autostash", "--quiet"],
+                                   cwd=vault, capture_output=True, timeout=45)
+        if completed.returncode:
+            raise RuntimeError("Digest result fetch unavailable")
+
+
+async def _request_digest(update, context, period):
+    if period not in _DIGEST_PERIODS:
+        await update.effective_message.reply_text("Выбери период разбора.", reply_markup=_inline(_digest_period_view()))
+        return
+    _clear_inputs(context.user_data)
+    job = None
+    try:
+        key = "telegram:" + str(getattr(update, "update_id", ""))
+        if not getattr(update, "update_id", None):
+            key = ""
+        job = await asyncio.to_thread(thought_digest_jobs.enqueue, _vault(), period, key=key, now=_now())
+        await asyncio.to_thread(_sync_digest, job)
+        text = ("💡 Разбираю мысли: " + _DIGEST_PERIODS[period] + ".\n"
+                "Ответ пришлю сюда. Обычно это занимает пару минут; если Mac спит — после пробуждения.\n"
+                "Разбор ничего не удаляет и не создаёт задач автоматически.")
+    except Exception as error:
+        logger.warning("digest request failed: %s", type(error).__name__)
+        text = ("Запрос сохранён, но пока не удалось передать его на Mac. Повторю автоматически." if job
+                else "Не удалось поставить разбор в очередь. Записи сохранены; попробуй ещё раз.")
+    wake = context.bot_data.get("digest_wake")
+    if wake is not None:
+        wake.set()
+    query = getattr(update, "callback_query", None)
+    if query is not None and (query.data or "").startswith("dg:"):
+        await ui.safe_edit(query, text, MAIN_KEYBOARD)
+    else:
+        await update.effective_message.reply_text(text, reply_markup=MAIN_KEYBOARD)
+
+
+def _digest_result_view(job_id, result):
+    text = thought_digest.render(result)
+    rows = []
+    for source in result.get("snapshot", {}).get("sources", [])[:45]:
+        source_id = source.get("id", "")
+        if not re.fullmatch(r"s[1-9][0-9]{0,2}", source_id):
+            continue
+        label = source_id[1:] + ". " + " ".join(source.get("title", "Мысль").split())[:42]
+        rows.append([(label, "dg:o:" + job_id + ":" + source_id)])
+    rows.append([("💡 Другой период", "m:digest")])
+    return ui.View(text, rows)
+
+
+async def _handle_digest_callback(update, context, data):
+    _clear_inputs(context.user_data)
+    if data.startswith("dg:p:"):
+        await _request_digest(update, context, data[5:])
+        return
+    match = re.fullmatch(r"dg:o:([a-f0-9]{24}):(s[1-9][0-9]{0,2})", data)
+    if match:
+        saved = await asyncio.to_thread(thought_digest_jobs.get_result, _vault(), match.group(1))
+        sources = saved.get("result", {}).get("snapshot", {}).get("sources", []) if saved else []
+        source = next((source for source in sources if source.get("id") == match.group(2)), None)
+        if source:
+            token = ui.issue_thought_token(context.user_data, source["identity"])
+            view = await asyncio.to_thread(ui.render_thought, context.user_data, _vault(), _runtime_store(), token, now=_now())
+            view.rows.append([("💡 Разбор мыслей", "m:digest")])
+            await ui.safe_edit(update.callback_query, view.text, _inline(view))
+            return
+    await ui.safe_edit(update.callback_query, "Этот разбор недоступен. Открой новый.", MAIN_KEYBOARD)
+
+
+async def _digest_tick(application, ledger):
+    requests = await asyncio.to_thread(thought_digest_jobs.requests, _vault(), limit=2000)
+    unsent = [request for request in requests if not await asyncio.to_thread(ledger.contains, request["id"])]
+    if not unsent:
+        return
+    await asyncio.to_thread(_sync_digest)
+    for request in unsent[:5]:
+        saved = await asyncio.to_thread(thought_digest_jobs.get_result, _vault(), request["id"])
+        if saved is None:
+            continue
+        view = _digest_result_view(request["id"], saved["result"])
+        await application.bot.send_message(chat_id=ALLOWED_USER, text=view.text,
+                                           reply_markup=_inline(view), disable_notification=False)
+        await asyncio.to_thread(ledger.mark, request["id"])
+
+
+async def _digest_loop(application, stop, wake):
+    # Separate local DB: durable acknowledgements, no personal text and no change
+    # to the existing focus/reminder runtime schema.
+    ledger = DeliveryLedger(runtime_store.default_db_path().with_name("thought-digest-delivery.sqlite3"))
+    while not stop.is_set():
+        try:
+            await asyncio.wait_for(wake.wait(), timeout=60)
+        except asyncio.TimeoutError:
+            logger.debug("digest poll interval")
+        wake.clear()
+        if stop.is_set():
+            break
+        try:
+            await _digest_tick(application, ledger)
+        except Exception as error:
+            logger.warning("digest delivery deferred: %s", type(error).__name__)
 
 
 async def _maybe_menu_reminder(update, context, text):
@@ -615,6 +750,11 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
             reply_markup=MAIN_KEYBOARD)
         return
 
+    period = thought_digest.parse_request(text)
+    if period is not None:
+        await _request_digest(update, context, period)
+        return
+
     # --- Совместимость: старые явные префиксы и power-user команды. ---------
     # Всё, что меняет файлы, идёт через общий dispatch и получает neutral sync
     # ровно один раз при реальной не-private мутации.
@@ -849,6 +989,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await _remove_legacy_keyboard(update, context)
             await _handle_menu_callback(update, context, data)
             return
+        if data.startswith("dg:"):
+            await _handle_digest_callback(update, context, data)
+            return
         if data == "x":
             _clear_inputs(state)
             await ui.safe_edit(query, "Отменено. Что сделать?", MAIN_KEYBOARD)
@@ -1011,6 +1154,11 @@ async def post_init(application: Application):
     Не используем `Application.create_task`: его `Application.stop` ждёт, а наш
     scheduler завершается по stop-событию, а не по вечному ожиданию.
     """
+    digest_stop = asyncio.Event()
+    digest_wake = asyncio.Event()
+    application.bot_data["digest_stop"] = digest_stop
+    application.bot_data["digest_wake"] = digest_wake
+    application.bot_data["digest_task"] = asyncio.create_task(_digest_loop(application, digest_stop, digest_wake))
     store = _runtime_store()
     if store is None:
         logger.error("focus scheduler skipped: runtime store unavailable")
@@ -1103,6 +1251,22 @@ async def post_shutdown(application: Application):
                 await r_task
         except asyncio.CancelledError:
             pass
+    digest_stop = application.bot_data.get("digest_stop")
+    digest_wake = application.bot_data.get("digest_wake")
+    digest_task = application.bot_data.get("digest_task")
+    if digest_stop is not None:
+        digest_stop.set()
+    if digest_wake is not None:
+        digest_wake.set()
+    if digest_task is not None:
+        try:
+            await asyncio.wait_for(digest_task, timeout=5)
+        except asyncio.TimeoutError:
+            digest_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await digest_task
+        except asyncio.CancelledError:
+            logger.debug("digest scheduler already cancelled")
     logger.info("Dusk schedulers stopped")
 
 

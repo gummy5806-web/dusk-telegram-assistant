@@ -113,6 +113,7 @@ class TransportBase(unittest.IsolatedAsyncioTestCase):
             "re": __import__("re"),
             "asyncio": asyncio,
             "ui": FakeUI(),
+            "thought_digest": __import__("thought_digest"),
             "assistant_router": self.router,
             "personal_search": personal_search,
             "ask": types.SimpleNamespace(answer=lambda query: "RESEARCH"),

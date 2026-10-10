@@ -415,6 +415,7 @@ def _hub_rows() -> list:
     return [
         [("📥 Inbox", THOUGHT_INBOX), ("🆕 Последние", THOUGHT_RECENT)],
         [("💡 Вспомнить", THOUGHT_REMEMBER), ("🔎 Найти", THOUGHT_SEARCH)],
+        [("💡 Разбор мыслей", "m:digest")],
     ]
 
 

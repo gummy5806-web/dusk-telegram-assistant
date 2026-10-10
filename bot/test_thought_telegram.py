@@ -397,6 +397,7 @@ class CaptureConfirmationTests(unittest.IsolatedAsyncioTestCase):
             "re": __import__("re"),
             "asyncio": __import__("asyncio"),
             "ui": _FakeUI(),
+            "thought_digest": __import__("thought_digest"),
             "assistant_router": __import__("assistant_router"),
             "personal_search": __import__("personal_search"),
             "ask": types.SimpleNamespace(answer=lambda query: "RESEARCH"),

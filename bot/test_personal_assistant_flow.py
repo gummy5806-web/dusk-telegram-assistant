@@ -145,6 +145,7 @@ class ContentHarness:
             "re": __import__("re"),
             "asyncio": __import__("asyncio"),
             "ui": self.ui,
+            "thought_digest": __import__("thought_digest"),
             "assistant_router": assistant_router,
             "personal_search": personal_search,
             "ask": types.SimpleNamespace(

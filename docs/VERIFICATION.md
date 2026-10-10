@@ -43,3 +43,7 @@
 совпали. При интеграции 842 файла вне патча совпали побайтно по SHA-256.
 Сервис active/running, NRestarts=0; новое inline menu реально доставлено
 в чат владельца (message 76). См. `docs/history/2026-10-09-chat-controls-acceptance.md`.
+
+## Разбор мыслей — 10 октября 2026
+
+1175/1175 Python tests на PTB 21.5, без skip. Из них 43 новых tests core/queue/transport/delivery. RED воспроизведён для отсутствующего интерфейса, cancellation и backlog; meaningful source-identity, created-time, malformed queue и concurrency regressions прошли. Read-only reviewer: ACCEPT после исправлений. Python compile/diff-check и LaunchAgent plist lint — PASS. Реальная модель, установка и доставка фиксируются в отдельной приёмке.

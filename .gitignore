@@ -45,3 +45,6 @@ node_modules/
 .trash/
 *.zip
 *.bundle
+
+# Personal thought-digest requests/results belong to the working vault only
+/SYSTEM/THOUGHT_DIGEST/
