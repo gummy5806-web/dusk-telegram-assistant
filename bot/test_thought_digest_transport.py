@@ -44,6 +44,15 @@ class DigestTransportTests(unittest.IsolatedAsyncioTestCase):
         request.assert_not_awaited()
         save.assert_called_once()
 
+    async def test_old_report_keyboard_opens_status_without_capture(self):
+        self.message.text = '📊 Отчёт за день'
+        ui.begin(self.state, ui.MODE_NOTE)
+        with patch.object(bot, '_show_status', AsyncMock()) as status, patch.object(bot, 'handle_content', AsyncMock()) as capture:
+            await bot.handle_text(self.update, self.context)
+        status.assert_awaited_once()
+        capture.assert_not_awaited()
+        self.assertEqual(ui.mode(self.state), '')
+
     async def test_picker_clears_modes(self):
         ui.begin(self.state,ui.MODE_NOTE)
         self.query.data='m:digest'

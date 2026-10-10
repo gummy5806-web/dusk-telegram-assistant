@@ -115,6 +115,31 @@ class CollectTests(VaultBase):
         self.assertTrue(all(item["id"] == f"s{index}" for index, item in enumerate(snapshot["sources"], 1)))
         self.assertEqual(json.loads(json.dumps(snapshot)), snapshot)
 
+    def test_daily_model_input_uses_capture_not_generated_title_insight_or_links(self):
+        self.note("2026-10-09 — Пересказ агента.md",
+                  "# Выдуманный ежедневный план\n\n## Мысль\n- Хочу попробовать короткое видео\n\n"
+                  "## Контекст\n- другие агентские заголовки\n\n## Вывод\n- Публиковать ежедневно\n\n"
+                  "## Связи\n- [[Чужой проект]]", "2026-10-09")
+        source = thought_digest.collect(self.root, "yesterday", NOW)["sources"][0]
+        self.assertEqual(source["text"], "Хочу попробовать короткое видео")
+        self.assertEqual(source["title"], "Хочу попробовать короткое видео")
+        self.assertIsNotNone(thought_feed.load_thought(self.root, source["identity"]))
+
+    def test_capture_keeps_multiline_and_fenced_headings_but_not_agent_sections(self):
+        capture = "Моя идея\n\n```md\n## Вывод\nЭто цитата внутри исходной мысли\n```\nПродолжение"
+        self.note("2026-10-09 — Много строк.md", "# Заголовок агента\n\n## Мысль\n- " + capture + "\n\n## Контекст\n- служебное\n", "2026-10-09")
+        source = thought_digest.collect(self.root, "yesterday", NOW)["sources"][0]
+        self.assertEqual(source["text"], capture)
+
+    def test_empty_capture_does_not_fall_back_to_agent_conclusion(self):
+        self.note("2026-10-09 — Нет записи.md", "# Задача агента\n\n## Мысль\n\n## Вывод\n- писать ежедневно", "2026-10-09")
+        self.assertEqual(thought_digest.collect(self.root, "yesterday", NOW)["sources"], [])
+
+    def test_legacy_report_button_is_not_a_thought_source(self):
+        self.note("2026-10-09 — подготовить отчёт.md", "# подготовить отчёт\n\n## Мысль\n- 📊 Отчёт за день\n\n## Вывод\n- делай отчёт", "2026-10-09")
+        self.inbox("- **09:00** 📊 Отчёт за день")
+        self.assertEqual(thought_digest.collect(self.root, "recent", NOW)["sources"], [])
+
     def test_dated_query_keeps_time_only_inbox_as_uncertain_context(self):
         self.inbox("- **09:15** запись без даты")
         self.note("2026-10-09 — Датированная.md", "# Датированная\n\nНадёжная запись", "2026-10-09")

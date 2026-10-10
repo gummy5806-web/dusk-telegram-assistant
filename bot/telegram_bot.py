@@ -587,7 +587,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Main buttons и Отмена сбрасывают custom-reminder ввод, обычный текст — нет.
     if text in ui.MAIN_BUTTONS or text in (
             ui.BTN_SEARCH, ui.BTN_NOTE, ui.BTN_VIDEO, BTN_LEFT, BTN_INBOX,
-            ui.BTN_CANCEL, "отмена", "cancel"):
+            ui.BTN_CANCEL, "отмена", "cancel", "📊 Отчёт за день"):
         _clear_inputs(state)
 
     # --- Главная клавиатура: кнопки важнее режима, ими из него выходят. -----
@@ -623,7 +623,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                         reply_markup=cancel_keyboard())
         return
 
-    if text == ui.BTN_STATUS:
+    if text in (ui.BTN_STATUS, "📊 Отчёт за день"):
         ui.cancel(state)
         await _show_status(update, context)
         return
