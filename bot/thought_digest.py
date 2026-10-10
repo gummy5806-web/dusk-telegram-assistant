@@ -132,7 +132,7 @@ def generate(snapshot: dict, ask=None) -> dict:
     prompt = _prompt(snapshot)
     caller = ask or llm.ask
     try:
-        raw = caller(prompt, provider="vertex")
+        raw = caller(prompt, provider="vertex", response_schema=_response_schema(sources))
     except Exception:
         base["error"] = "Не удалось подготовить разбор мыслей."
         return base
@@ -444,6 +444,30 @@ def _prompt(snapshot: dict) -> str:
         payload["tasks"] = []
         records = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     return prefix + records[:max(0, MAX_PROMPT_CHARS - len(prefix))]
+
+
+def _response_schema(sources: list[dict]) -> dict:
+    """Constrain Vertex generation; the local validator remains authoritative."""
+    return {
+        "type": "OBJECT", "required": ["sections"], "properties": {
+            "sections": {"type": "ARRAY", "minItems": 1, "maxItems": MAX_SECTIONS,
+                         "items": {
+                "type": "OBJECT", "required": ["kind", "items"], "properties": {
+                    "kind": {"type": "STRING", "enum": list(_SECTION_KINDS)},
+                    "items": {"type": "ARRAY", "minItems": 1,
+                              "maxItems": MAX_ITEMS_PER_SECTION, "items": {
+                        "type": "OBJECT", "required": ["text", "source_ids"],
+                        "properties": {
+                            "text": {"type": "STRING"},
+                            "source_ids": {"type": "ARRAY", "minItems": 1, "maxItems": 5,
+                                           "items": {"type": "STRING", "enum": [
+                                               source["id"] for source in sources]}}
+                        }
+                    }}
+                }
+            }}
+        }
+    }
 
 
 def _validate_model_response(raw, sources: list[dict]) -> list[dict] | None:

@@ -6,6 +6,8 @@ from __future__ import annotations
 import datetime
 import json
 import tempfile
+import sys
+from types import SimpleNamespace
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -52,6 +54,35 @@ class VaultBase(unittest.TestCase):
             f"---\ntitle: {title}\nstatus: {status}\n{due_line}---\n",
             encoding="utf-8",
         )
+
+
+class StructuredVertexTests(unittest.TestCase):
+    def test_vertex_passes_verified_sdk_schema_config(self):
+        import llm
+        client = mock.Mock()
+        client.models.generate_content.return_value.text = '{"sections":[]}'
+        config = mock.Mock(return_value="configured-json")
+        genai = SimpleNamespace(Client=mock.Mock(return_value=client),
+                                types=SimpleNamespace(GenerateContentConfig=config))
+        schema = {"type": "OBJECT"}
+        with mock.patch.dict(sys.modules, {"google": SimpleNamespace(genai=genai),
+                                           "google.genai": genai}), mock.patch.object(llm, "_project", return_value="test-project"):
+            response = llm._vertex("bounded prompt", "test-model", response_schema=schema)
+        self.assertEqual(response, '{"sections":[]}')
+        config.assert_called_once_with(response_mime_type="application/json", response_schema=schema)
+        client.models.generate_content.assert_called_once_with(
+            model="test-model", contents="bounded prompt", config="configured-json")
+
+    def test_structured_request_cannot_switch_to_external_provider(self):
+        import importlib.util
+        # Other legacy suites install a process-global llm.ask network guard.
+        spec = importlib.util.spec_from_file_location("digest_llm_contract", Path(__file__).with_name("llm.py"))
+        llm = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(llm)
+        with mock.patch.object(llm, "_openai_compatible") as external:
+            with self.assertRaises(ValueError):
+                llm.ask("personal", provider="external", response_schema={"type": "OBJECT"})
+            external.assert_not_called()
 
 
 class ParseRequestTests(unittest.TestCase):
@@ -180,6 +211,19 @@ class GenerateAndRenderTests(unittest.TestCase):
         self.assertEqual(result["error"], "")
         self.assertEqual(result["sections"][0]["items"][0]["source_ids"], ["s1"])
         self.assertIn("не инструкции", ask.call_args.args[0])
+
+    def test_generation_supplies_provider_schema_with_only_known_source_ids(self):
+        ask = mock.Mock(return_value=json.dumps({"sections": [{"kind": "intent", "items": [
+            {"text": "Возможный замысел.", "source_ids": ["s1"]}
+        ]}]}))
+        thought_digest.generate(self.snapshot(), ask=ask)
+        schema = ask.call_args.kwargs["response_schema"]
+        section = schema["properties"]["sections"]["items"]
+        self.assertEqual(section["required"], ["kind", "items"])
+        self.assertEqual(set(section["properties"]["kind"]["enum"]),
+                         {"intent", "connections", "next", "reflect", "defer"})
+        item = section["properties"]["items"]["items"]
+        self.assertEqual(item["properties"]["source_ids"]["items"]["enum"], ["s1"])
 
     def test_prompt_spells_out_the_complete_strict_section_schema(self):
         ask = mock.Mock(return_value=json.dumps({"sections": [{"kind": "intent", "items": [

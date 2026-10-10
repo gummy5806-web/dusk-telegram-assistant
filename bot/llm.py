@@ -63,7 +63,7 @@ def _project() -> str:
     return ""
 
 
-def _vertex(prompt: str, model: str) -> str:
+def _vertex(prompt: str, model: str, *, response_schema: dict | None = None) -> str:
     try:
         from google import genai
     except ImportError:
@@ -78,7 +78,12 @@ def _vertex(prompt: str, model: str) -> str:
     location = os.getenv("VERTEX_LOCATION") or DEFAULT_LOCATION
     try:
         client = genai.Client(vertexai=True, project=project, location=location)
-        response = client.models.generate_content(model=model, contents=prompt)
+        kwargs = {}
+        if response_schema is not None:
+            from google.genai import types
+            kwargs["config"] = types.GenerateContentConfig(
+                response_mime_type="application/json", response_schema=response_schema)
+        response = client.models.generate_content(model=model, contents=prompt, **kwargs)
         text = getattr(response, "text", None)
         if text:
             return text
@@ -111,8 +116,14 @@ def _openai_compatible(prompt: str, model: str) -> str:
         return f"Ошибка модели ({type(e).__name__}): {str(e)[:200]}"
 
 
-def ask(prompt: str, provider: str | None = None, model: str | None = None) -> str:
+def ask(prompt: str, provider: str | None = None, model: str | None = None,
+        *, response_schema: dict | None = None) -> str:
     provider = (provider or os.getenv("LLM_PROVIDER") or "vertex").lower()
     if provider == "vertex":
+        if response_schema is not None:
+            return _vertex(prompt, model or os.getenv("LLM_MODEL") or DEFAULT_VERTEX_MODEL,
+                           response_schema=response_schema)
         return _vertex(prompt, model or os.getenv("LLM_MODEL") or DEFAULT_VERTEX_MODEL)
+    if response_schema is not None:
+        raise ValueError("structured output requires Vertex")
     return _openai_compatible(prompt, model or os.getenv("LLM_MODEL") or "qwen-plus")
