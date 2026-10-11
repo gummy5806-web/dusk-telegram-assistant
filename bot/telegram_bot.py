@@ -248,6 +248,7 @@ def _clear_inputs(state):
     ui.clear_thought_edit(state)
     ui.clear_thought_delete(state)
     state.pop("menu_reminder_input", None)
+    state.pop("digest_edit_return", None)
 
 
 async def _remove_legacy_keyboard(update, context):
@@ -403,11 +404,49 @@ def _digest_result_view(job_id, result):
     return ui.View(text, rows)
 
 
+def _digest_return_view(view, job_id):
+    if not re.fullmatch(r"[a-f0-9]{24}", job_id or ""):
+        return view
+    return ui.View(view.text, [list(row) for row in view.rows] + [
+        [("⬅️ К этому разбору", "dg:r:" + job_id)]], stale=view.stale)
+
+
+def _bind_digest_message(state, message, job_id):
+    message_id = getattr(message, "message_id", None)
+    if type(message_id) is not int or message_id <= 0:
+        return
+    messages = state.setdefault("digest_messages", {})
+    messages[str(message_id)] = job_id
+    while len(messages) > 64:
+        del messages[next(iter(messages))]
+
+
+def _message_digest(state, message):
+    # Inline markup survives a bot restart; the bounded map also supports
+    # messages returned by transports without their markup populated.
+    markup = getattr(message, "reply_markup", None)
+    for row in getattr(markup, "inline_keyboard", ()) or ():
+        for button in row:
+            match = re.fullmatch(r"dg:r:([a-f0-9]{24})", button.callback_data or "")
+            if match:
+                return match.group(1)
+    return state.get("digest_messages", {}).get(str(getattr(message, "message_id", None)), "")
+
+
 async def _handle_digest_callback(update, context, data):
     _clear_inputs(context.user_data)
     if data.startswith("dg:p:"):
         await _request_digest(update, context, data[5:])
         return
+    match = re.fullmatch(r"dg:r:([a-f0-9]{24})", data)
+    if match:
+        saved = await asyncio.to_thread(thought_digest_jobs.get_result, _vault(), match.group(1))
+        if saved:
+            view = _digest_result_view(match.group(1), saved["result"])
+            context.user_data.get("digest_messages", {}).pop(
+                str(getattr(update.callback_query.message, "message_id", None)), None)
+            await ui.safe_edit(update.callback_query, view.text, _inline(view))
+            return
     match = re.fullmatch(r"dg:o:([a-f0-9]{24}):(s[1-9][0-9]{0,2})", data)
     if match:
         saved = await asyncio.to_thread(thought_digest_jobs.get_result, _vault(), match.group(1))
@@ -416,8 +455,9 @@ async def _handle_digest_callback(update, context, data):
         if source:
             token = ui.issue_thought_token(context.user_data, source["identity"])
             view = await asyncio.to_thread(ui.render_thought, context.user_data, _vault(), _runtime_store(), token, now=_now())
-            view.rows.append([("💡 Разбор мыслей", "m:digest")])
-            await ui.safe_edit(update.callback_query, view.text, _inline(view))
+            view = _digest_return_view(view, match.group(1))
+            message = await update.callback_query.message.reply_text(view.text, reply_markup=_inline(view))
+            _bind_digest_message(context.user_data, message, match.group(1))
             return
     await ui.safe_edit(update.callback_query, "Этот разбор недоступен. Открой новый.", MAIN_KEYBOARD)
 
@@ -493,9 +533,12 @@ async def _reply_task_submission(update, context, result):
     await update.message.reply_text(result.text, reply_markup=_keyboard(ui.keyboard_for(result)))
 
 
-async def _reply_saved_thought(update, context, text, path="", line=""):
+async def _reply_saved_thought(update, context, text, path="", line="", digest_job=""):
     view = await asyncio.to_thread(ui.saved_thought_view, context.user_data, _vault(), path=path, line=line)
-    await update.message.reply_text(text, reply_markup=_inline(view) or MAIN_KEYBOARD)
+    view = _digest_return_view(view, digest_job)
+    message = await update.message.reply_text(text, reply_markup=_inline(view) or MAIN_KEYBOARD)
+    if digest_job:
+        _bind_digest_message(context.user_data, message, digest_job)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -706,11 +749,16 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
     if await _maybe_menu_reminder(update, context, text):
         return
     if ui.thought_edit_pending(state):
+        digest_job = state.get("digest_edit_return", "")
         result = await asyncio.to_thread(ui.submit_thought_edit, state, _vault(), text, sync=_sync_note)
         if result.ok:
-            await _reply_saved_thought(update, context, result.text, path=result.path)
+            state.pop("digest_edit_return", None)
+            await _reply_saved_thought(update, context, result.text, path=result.path, digest_job=digest_job)
         else:
-            await update.message.reply_text(result.text, reply_markup=cancel_keyboard())
+            view = _digest_return_view(ui.View(result.text, [[("Отмена", "x")]]), digest_job)
+            message = await update.message.reply_text(result.text, reply_markup=_inline(view))
+            if digest_job:
+                _bind_digest_message(state, message, digest_job)
         return
     if await _maybe_reminder_custom(update, context, text):
         return
@@ -848,6 +896,10 @@ async def _handle_thought_callback(update: Update, context: ContextTypes.DEFAULT
     parts = data.split(":", 2)
     action = parts[1] if len(parts) > 1 else ""
     token = parts[2] if len(parts) > 2 else ""
+    digest_job = _message_digest(state, query.message)
+    if action not in {"o", "c", "b", "n", "x", "e", "d", "z", "u", "t"}:
+        digest_job = ""
+        state.get("digest_messages", {}).pop(str(getattr(query.message, "message_id", None)), None)
     if action != "z":
         _clear_inputs(state)
 
@@ -874,6 +926,8 @@ async def _handle_thought_callback(update: Update, context: ContextTypes.DEFAULT
     elif action == "e":
         _clear_inputs(state)
         view = await asyncio.to_thread(ui.begin_thought_edit, state, _vault(), token)
+        if digest_job and ui.thought_edit_pending(state):
+            state["digest_edit_return"] = digest_job
     elif action == "d":
         _clear_inputs(state)
         view = await asyncio.to_thread(ui.confirm_thought_delete, state, _vault(), token)
@@ -891,6 +945,7 @@ async def _handle_thought_callback(update: Update, context: ContextTypes.DEFAULT
             view = ui.View(result.text + "\n\n" + view.text, view.rows)
     else:
         view = ui.render_thoughts(state, _vault(), store=store, now=now)
+    view = _digest_return_view(view, digest_job)
     await ui.safe_edit(query, view.text, _inline(view))
 
 
