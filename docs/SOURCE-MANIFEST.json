@@ -1,5 +1,5 @@
 {
-  "vault_head": "9fe3473300dbd2855647bfd28be8cafc2f43bd6d",
+  "vault_head": "efd56e33ba6a61dfbc221fe4bae007177d3a26da",
   "desktop_head": "452e7789c0dc9671870c3c608e9dd4dca270074a",
   "files": [
     {
@@ -452,9 +452,9 @@
     {
       "path": "bot/telegram_bot.py",
       "source": "~/Documents/obsidian/my dusk/bot/telegram_bot.py",
-      "sha256": "00611a1f4976648bd310a7ca59be94c46b8e205117cd34e12785158f327c731a",
+      "sha256": "a0b752f2b4bed8697d66103eedbcf63319e67748804a6bcc6bbe5846b767ba6e",
       "initial_source_sha256": "aca3a7776b739113474e75636e5fb90aa167b018aa2580827e482750f81888cf",
-      "updated": "2026-10-10 thought-lifecycle"
+      "updated": "2026-10-11"
     },
     {
       "path": "bot/test_advance_dates.py",
@@ -1003,6 +1003,12 @@
       "change": "thought-lifecycle",
       "tests": 1196,
       "verification": "Codex tests, installed VPS and read-only real card checks"
+    },
+    {
+      "date": "2026-10-11",
+      "change": "digest-navigation",
+      "tests": 1206,
+      "verification": "Codex; 10 focused regressions; source/Mac/installed VPS suites; 2 installed hashes"
     }
   ]
 }
