@@ -1,5 +1,5 @@
 {
-  "vault_head": "efd56e33ba6a61dfbc221fe4bae007177d3a26da",
+  "vault_head": "a82391302d0cac7b7cefc2422f8db1689caf9a5d",
   "desktop_head": "452e7789c0dc9671870c3c608e9dd4dca270074a",
   "files": [
     {
@@ -445,16 +445,16 @@
     {
       "path": "bot/task_ui.py",
       "source": "~/Documents/obsidian/my dusk/bot/task_ui.py",
-      "sha256": "7cabcc8fbe3cd79f1eeb0243d148ccaed446e1580b9d32e3c5098a0cd5ac445f",
+      "sha256": "56b31439823a858db4158b2d7456b10cfbc57c311b87d524737b80d56398d25c",
       "initial_source_sha256": "4922d2e4015cdf8c01605da3604669b3f17cbb14dde69aa54bf6d9e794e938b4",
-      "updated": "2026-10-10 thought-lifecycle"
+      "updated": "2026-10-13"
     },
     {
       "path": "bot/telegram_bot.py",
       "source": "~/Documents/obsidian/my dusk/bot/telegram_bot.py",
-      "sha256": "a0b752f2b4bed8697d66103eedbcf63319e67748804a6bcc6bbe5846b767ba6e",
+      "sha256": "338d0799ca349bd192013b9f85f554b2fff066bc3a7989a3e91e3c0e9e944477",
       "initial_source_sha256": "aca3a7776b739113474e75636e5fb90aa167b018aa2580827e482750f81888cf",
-      "updated": "2026-10-11"
+      "updated": "2026-10-13"
     },
     {
       "path": "bot/test_advance_dates.py",
@@ -489,9 +489,9 @@
     {
       "path": "bot/test_personal_assistant_flow.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_personal_assistant_flow.py",
-      "sha256": "2fcf015be4db03592c9c592fb6726b595ba19d981aed60413a701335937d0580",
+      "sha256": "6b3a408f824a3b69756e8a334b7c9e7deefdc8ebc00bd410dc016b62cae6e68b",
       "initial_source_sha256": "b7eed59e5cc0efdd15f9f1f10b74aa10fca1aa23bca6a7c8cf3d4e8f63a41414",
-      "updated": "thought-digest-20261010"
+      "updated": "2026-10-13"
     },
     {
       "path": "bot/test_personal_assistant_router.py",
@@ -531,9 +531,9 @@
     {
       "path": "bot/test_reminder_transport_runtime.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_reminder_transport_runtime.py",
-      "sha256": "0f4642f4f25de9bacc6c11c7f2d0c38fec8536a44a675f994e7f3a18d844c41e",
+      "sha256": "551a310b6637021314ac0dfe6d765701f61bca29276383f8cba739d233ae5c92",
       "initial_source_sha256": "e9570dc5a345c18ce30e520fffb16197ecd2e41cc226402648e8dcc7647c7e47",
-      "updated": "thought-digest-20261010"
+      "updated": "2026-10-13"
     },
     {
       "path": "bot/test_reminder_ui.py",
@@ -618,7 +618,9 @@
     {
       "path": "bot/test_stage4_research_bridge.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_stage4_research_bridge.py",
-      "sha256": "53380c935e44f8974babec9f77f3b8f1a0937f28985e38f911b63587ec0224d5"
+      "sha256": "e35d19b11ed68c4dc3d85adb500b6ca48e40bc520b16a9c735a463e8e4789c38",
+      "initial_source_sha256": "53380c935e44f8974babec9f77f3b8f1a0937f28985e38f911b63587ec0224d5",
+      "updated": "2026-10-13"
     },
     {
       "path": "bot/test_stage5_interface.py",
@@ -682,9 +684,9 @@
     {
       "path": "bot/test_thought_telegram.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_thought_telegram.py",
-      "sha256": "7cc3104116bc7ae7440c7b4d12120a4d8922dbee446ca5cba32305522c288672",
+      "sha256": "0654002a76b122e95a5df64c4652570748517f2f2f6000be14024b03b08fa854",
       "initial_source_sha256": "6a1b9a0a8faa7e3b6e235975e4b9a610ffa2eb474c45805e2e03da4e5c68b95a",
-      "updated": "thought-digest-20261010"
+      "updated": "2026-10-13"
     },
     {
       "path": "bot/test_weekly_plan.py",
@@ -1009,6 +1011,12 @@
       "change": "digest-navigation",
       "tests": 1206,
       "verification": "Codex; 10 focused regressions; source/Mac/installed VPS suites; 2 installed hashes"
+    },
+    {
+      "date": "2026-10-13",
+      "change": "personal-resources",
+      "tests": 1240,
+      "verification": "Codex; worker storage/UI; source/Mac/installed VPS suites; 11 hashes; real read-only resource/search/digest check; two synthetic captures quarantined"
     }
   ]
 }
