@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import datetime
+import functools
 import hashlib
 import os
 import tempfile
@@ -68,6 +69,10 @@ class BridgeBase(unittest.TestCase):
                                       "RESEARCH_BRAIN_PATH": str(self.research)})
         env.start()
         self.addCleanup(env.stop)
+        # These fixtures describe TODAY, independently of the machine's date.
+        clocked_search = patch.object(rb, "search", functools.partial(rb.search, today=TODAY))
+        clocked_search.start()
+        self.addCleanup(clocked_search.stop)
         for target in ("llm.ask", "llm._project", "urllib.request.urlopen",
                        "vault_ops.git_push", "subprocess.run", "os.system",
                        "queue_store.atomic_write"):

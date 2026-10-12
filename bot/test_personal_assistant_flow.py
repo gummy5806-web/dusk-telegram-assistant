@@ -148,6 +148,9 @@ class ContentHarness:
             "thought_digest": __import__("thought_digest"),
             "assistant_router": assistant_router,
             "personal_search": personal_search,
+            "resource_ui": __import__("resource_ui"),
+            "queue_store": __import__("queue_store"),
+            "_inline": lambda view: "MAIN_KB",
             "ask": types.SimpleNamespace(
                 answer=lambda query: (self.ask_calls.append(query) or "RESEARCH")),
             "_dispatch": types.SimpleNamespace(

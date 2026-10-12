@@ -37,6 +37,8 @@ import market
 import task_ui as ui
 import assistant_router
 import personal_search
+import resource_ui
+import queue_store
 import speech_to_text
 import dispatch as _dispatch
 import runtime_store
@@ -76,6 +78,7 @@ MENU_ACTIONS = (
     ((ui.BTN_NEW_TASK, "m:new"), (ui.BTN_TASKS, "m:tasks")),
     ((MENU_REMINDER, "m:remind"), (ui.BTN_STATUS, "m:status")),
     (("💡 Разбор мыслей", "m:digest"), (ui.BTN_MATERIAL, "m:material")),
+    (("🔖 Ресурсы", "m:resources"),),
 )
 
 
@@ -129,7 +132,8 @@ def _runtime_store():
 
 def _inline(view: ui.View):
     rows = [
-        [InlineKeyboardButton(label, callback_data=data) for label, data in row]
+        [InlineKeyboardButton(label, url=data[4:]) if data.startswith("url:")
+         else InlineKeyboardButton(label, callback_data=data) for label, data in row]
         for row in view.rows
     ]
     if rows:
@@ -249,6 +253,9 @@ def _clear_inputs(state):
     ui.clear_thought_delete(state)
     state.pop("menu_reminder_input", None)
     state.pop("digest_edit_return", None)
+    resource_ui.clear(state)
+    state.pop("resource_add", None)
+    state.pop("resource_search", None)
 
 
 async def _remove_legacy_keyboard(update, context):
@@ -302,6 +309,8 @@ async def _handle_menu_callback(update, context, data):
         return
     if action == "digest":
         view = _digest_period_view()
+    elif action == "resources":
+        view = await asyncio.to_thread(resource_ui.list_view, _vault())
     elif action == "tasks":
         view = await asyncio.to_thread(ui.render_list, state, _vault(), root=True)
     elif action == "thoughts":
@@ -541,6 +550,30 @@ async def _reply_saved_thought(update, context, text, path="", line="", digest_j
         _bind_digest_message(context.user_data, message, digest_job)
 
 
+async def _save_resource(update, context, text):
+    view = await asyncio.to_thread(resource_ui.capture, _vault(), text, sync=_sync_note)
+    if not view.stale:
+        _clear_inputs(context.user_data)
+    await update.message.reply_text(view.text, reply_markup=_inline(view) or MAIN_KEYBOARD)
+
+
+async def _handle_resource_callback(update, context, data):
+    state = context.user_data
+    if not data.startswith("rs:z:"):
+        _clear_inputs(state)
+    if data == "rs:a":
+        state["resource_add"] = True
+        view = ui.View("🔖 Пришли ссылку и, если хочешь, пояснение: зачем она тебе.",
+                       [[("Отмена", "m:resources")]])
+    elif data == "rs:s":
+        state["resource_search"] = True
+        view = ui.View("🔎 Что найти среди сохранённых ресурсов? Напиши обычными словами.",
+                       [[("Отмена", "m:resources")]])
+    else:
+        view = await asyncio.to_thread(resource_ui.callback, _vault(), state, data, sync=_sync_note)
+    await ui.safe_edit(update.callback_query, view.text, _inline(view) or MAIN_KEYBOARD)
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not auth_check(update):
         await update.message.reply_text("Доступ запрещён.")
@@ -555,7 +588,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "➕ Задача — создать ровно одну задачу (следующее — название).\n"
         "📋 Задачи — открыть список и менять статус кнопками.\n"
         "📋 Задачи → ⏱ Фокус — запустить блок 15/25/45/60/90 мин.\n"
-        "🎓 Материал — поставить ссылку в очередь на конспект.\n"
+        "🎓 Материал — видео в очередь на конспект, сайт в сохранённые ресурсы.\n"
+        "🔖 Ресурсы — сайты и инструменты: открыть, найти, исправить или удалить.\n"
         "📊 Статус — показать сводку.\n\n"
         "Просто текст без кнопки я сохраню в Inbox. Дальше мысль можно разобрать "
         "в «🧠 Мысли» или превратить в задачу кнопкой. «создай задачу …» создаст "
@@ -619,6 +653,11 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await _remove_legacy_keyboard(update, context)
     if (text or "").strip().casefold() in ("меню", "menu"):
         await handle_menu(update, context)
+        return
+    if text == "🔖 Ресурсы":
+        _clear_inputs(state)
+        view = await asyncio.to_thread(resource_ui.list_view, _vault())
+        await update.message.reply_text(view.text, reply_markup=_inline(view))
         return
     if text == MENU_REMINDER:
         _clear_inputs(state)
@@ -748,6 +787,18 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
     if await _maybe_menu_reminder(update, context, text):
         return
+    if resource_ui.edit_pending(state):
+        view = await asyncio.to_thread(resource_ui.submit_edit, _vault(), state, text, sync=_sync_note)
+        await update.message.reply_text(view.text, reply_markup=_inline(view) or MAIN_KEYBOARD)
+        return
+    if state.get("resource_search"):
+        state.pop("resource_search", None)
+        view = await asyncio.to_thread(resource_ui.search_view, _vault(), text)
+        await update.message.reply_text(view.text, reply_markup=_inline(view) or MAIN_KEYBOARD)
+        return
+    if state.get("resource_add"):
+        await _save_resource(update, context, text)
+        return
     if ui.thought_edit_pending(state):
         digest_job = state.get("digest_edit_return", "")
         result = await asyncio.to_thread(ui.submit_thought_edit, state, _vault(), text, sync=_sync_note)
@@ -785,6 +836,14 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
         return
 
     if current == ui.MODE_VIDEO:
+        links = re.findall(r"https?://[^\s<>]+", text, re.IGNORECASE)
+        if len(links) > 1 and any(queue_store.is_video_url(link) for link in links):
+            await update.message.reply_text("Пришли видео отдельным сообщением, а сайты — следующим. Здесь ничего не сохранил.",
+                                            reply_markup=cancel_keyboard())
+            return
+        if re.search(r"https?://", text) and ui.classify_video(text)[1]:
+            await _save_resource(update, context, text)
+            return
         result = ui.submit_video(state, text, sync=_sync_video)
         await update.message.reply_text(
             result.text, reply_markup=_keyboard(ui.keyboard_for(result)))
@@ -840,7 +899,12 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
         return
 
     # Ссылка на видео → в очередь на разбор (общий dispatch + neutral sync).
-    if re.search(r"https?://\S*(youtube\.com|youtu\.be|vimeo\.com|\S+podcast\S*)", text):
+    if any(queue_store.is_video_url(match.group(0))
+           for match in re.finditer(r"https?://[^\s<>]+", text, re.IGNORECASE)):
+        if len(re.findall(r"https?://[^\s<>]+", text, re.IGNORECASE)) > 1:
+            await update.message.reply_text("Пришли видео отдельным сообщением, а сайты — следующим. Здесь ничего не сохранил.",
+                                            reply_markup=MAIN_KEYBOARD)
+            return
         result = _dispatch.dispatch_detailed(text)
         ui.mutation_sync(result, _synced)
         await update.message.reply_text(result.text, reply_markup=MAIN_KEYBOARD)
@@ -855,6 +919,10 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
             return
 
     # --- Свободный Dusk-first роутер. ---------------------------------------
+    if re.fullmatch(r"(?:покажи\s+)?(?:мои\s+)?(?:ресурсы|сохранённые ссылки|сохраненные ссылки|сайты)", text, re.IGNORECASE):
+        view = await asyncio.to_thread(resource_ui.list_view, _vault())
+        await update.message.reply_text(view.text, reply_markup=_inline(view))
+        return
     if await _maybe_reminder_intent(update, context, text):
         return
     route = assistant_router.route(text)
@@ -864,13 +932,19 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
         return
 
     if route.kind == assistant_router.KIND_PERSONAL_SEARCH:
+        view = await asyncio.to_thread(resource_ui.search_view, _vault(), route.subject or text)
         await update.message.reply_text(
-            search_answer(route.subject or text, False), reply_markup=MAIN_KEYBOARD)
+            search_answer(route.subject or text, False), reply_markup=_inline(view) or MAIN_KEYBOARD)
         return
 
     if route.kind == assistant_router.KIND_KNOWLEDGE_SEARCH:
         await update.message.reply_text(
             search_answer(route.subject or text, True), reply_markup=MAIN_KEYBOARD)
+        return
+
+    # Сайты и инструменты сохраняются отдельно от мыслей без запроса модели.
+    if re.search(r"https?://", text, re.IGNORECASE):
+        await _save_resource(update, context, text)
         return
 
     # Всё неоднозначное безопасно сохраняется в Dusk Inbox.
@@ -1052,6 +1126,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         if data.startswith("dg:"):
             await _handle_digest_callback(update, context, data)
+            return
+        if data.startswith("rs:"):
+            await _handle_resource_callback(update, context, data)
             return
         if data == "x":
             _clear_inputs(state)

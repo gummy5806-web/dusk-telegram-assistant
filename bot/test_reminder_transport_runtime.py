@@ -116,6 +116,8 @@ class TransportBase(unittest.IsolatedAsyncioTestCase):
             "thought_digest": __import__("thought_digest"),
             "assistant_router": self.router,
             "personal_search": personal_search,
+            "resource_ui": __import__("resource_ui"),
+            "queue_store": __import__("queue_store"),
             "ask": types.SimpleNamespace(answer=lambda query: "RESEARCH"),
             "_dispatch": types.SimpleNamespace(
                 shared_prefix=lambda text: False,
