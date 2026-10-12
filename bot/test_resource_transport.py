@@ -1,5 +1,6 @@
 """Actual Telegram routes for saved sites, without a network or real vault."""
 import tempfile
+import os
 import types
 import unittest
 from pathlib import Path
@@ -20,7 +21,11 @@ class ResourceTransportTests(unittest.IsolatedAsyncioTestCase):
         self.context = types.SimpleNamespace(user_data=self.state, bot_data={})
         self.sync = Mock()
         self.inbox = Mock(return_value='entry')
-        for name, value in [('auth_check', lambda u: True), ('_vault', lambda: self.vault), ('_sync_note', self.sync), ('append_to_inbox', self.inbox), ('_related_hint', lambda t: '')]:
+        env = patch.dict(os.environ, {'VAULT_PATH': str(self.vault)})
+        env.start(); self.addCleanup(env.stop)
+        dispatch = patch.object(bot._dispatch, 'dispatch_detailed', return_value=types.SimpleNamespace(text='dispatch', mutated=False))
+        dispatch.start(); self.addCleanup(dispatch.stop)
+        for name, value in [('auth_check', lambda u: True), ('_vault', lambda: self.vault), ('_sync_note', self.sync), ('_sync_task', Mock()), ('_sync_video', Mock()), ('append_to_inbox', self.inbox), ('_related_hint', lambda t: '')]:
             p = patch.object(bot, name, value); p.start(); self.addCleanup(p.stop)
 
     def records(self):
