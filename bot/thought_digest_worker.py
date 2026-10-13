@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 
 import thought_digest_jobs as jobs
+import assistant_jobs
 
 
 def result_path(vault: Path | str, job_id: str) -> Path:
@@ -80,9 +81,9 @@ def run_worker(vault: Path | str, generate=None) -> int:
             job_id = jobs.process_one(vault, generate=generate)
         except jobs.QueueSafetyError:
             return 6
-        if not job_id:
-            return 0
-        return 0 if jobs.sync_file(vault, result_path(vault, job_id)) else 4
+        if job_id and not jobs.sync_file(vault, result_path(vault, job_id)):
+            return 4
+        return 0 if assistant_jobs.run(vault) else 7
 
 
 def main(argv: list[str] | None = None) -> int:

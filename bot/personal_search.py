@@ -20,6 +20,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import frontmatter
+import memory_history
+import thought_feed
 
 INBOX_REL = "ZETA/FLEETING/00 Инбокс.md"
 ROOT_FILES = ("Отложено.md", "Статус.md", "Недельный обзор.md")
@@ -55,6 +57,7 @@ EMPTY_PERSONAL = (
 KIND_LABEL = {
     "inbox": "💭 Inbox",
     "fleeting": "🗒 Заметка",
+    "history": "🕘 Прошлая запись",
     "permanent": "🧠 Знание",
     "task": "✅ Задача",
     "project": "📁 Проект",
@@ -330,9 +333,12 @@ def search(query: str, vault=None, limit: int = MAX_RESULTS):
         return []
 
     hits = []
+    historical = bool(re.search(r"раньше|прежн|прошл|старую|старая|истори", query, re.IGNORECASE))
     inbox_path = root / INBOX_REL
     if inbox_path.is_file() and not inbox_path.is_symlink() and _inside(root, inbox_path):
         inbox_text = _read_text(inbox_path)
+        if inbox_text and not historical:
+            inbox_text = "\n".join(line for line in inbox_text.splitlines() if not memory_history.is_past(root, thought_feed._identity_text(INBOX_REL, line.strip())))
         if inbox_text:
             hits.extend(_inbox_hits(inbox_text, INBOX_REL, terms, phrase))
 
@@ -349,10 +355,13 @@ def search(query: str, vault=None, limit: int = MAX_RESULTS):
             relative = path.relative_to(root).as_posix()
         except ValueError:
             relative = path.name
+        past = kind == "fleeting" and memory_history.is_past(root, thought_feed._identity_text(relative, text))
+        if past and not historical:
+            continue
         hits.append(Hit(
             path=relative,
             title=title,
-            kind=kind,
+            kind="history" if past else kind,
             excerpt=_excerpt(body, terms, phrase),
             score=score,
             created=frontmatter.get(text, "created"),

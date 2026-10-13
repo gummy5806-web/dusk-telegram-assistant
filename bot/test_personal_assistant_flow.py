@@ -151,6 +151,7 @@ class ContentHarness:
             "resource_ui": __import__("resource_ui"),
             "queue_store": __import__("queue_store"),
             "_inline": lambda view: "MAIN_KB",
+            "_semantic_query_button": lambda state, query: ("Поиск по смыслу", "ss:test"),
             "ask": types.SimpleNamespace(
                 answer=lambda query: (self.ask_calls.append(query) or "RESEARCH")),
             "_dispatch": types.SimpleNamespace(

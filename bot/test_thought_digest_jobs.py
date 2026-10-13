@@ -86,6 +86,9 @@ class DigestJobsTests(unittest.TestCase):
 
 class WorkerTests(unittest.TestCase):
     def setUp(self):
+        auxiliary = mock.patch.object(worker.assistant_jobs, "run", return_value=True)
+        auxiliary.start()
+        self.addCleanup(auxiliary.stop)
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.vault = Path(self.tmp.name)

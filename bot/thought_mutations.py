@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import inbox_core
+import memory_history
 import thought_feed
 
 TRASH_REL = ".trash/dusk-thoughts"
@@ -115,6 +116,7 @@ def _edit_structured(root: Path, identity: str, text: str) -> Mutation:
     path = _structured_path(root, current.path)
     if path is None:
         return Mutation(False, "⚠️ Мысль недоступна.")
+    rel = current.path
     with inbox_core.locked_write(path):
         raw = _read_current_structured(root, path, identity)
         if raw is None:
@@ -124,9 +126,23 @@ def _edit_structured(root: Path, identity: str, text: str) -> Mutation:
             return Mutation(False, "⚠️ У этой заметки нет безопасного раздела «Мысль».")
         if rewritten == raw:
             return Mutation(False, "Мысль уже содержит этот текст.")
-        inbox_core.atomic_write(path, rewritten)
-    rel = current.path
-    changed = thought_feed.load_thought(root, thought_feed._identity_text(rel, rewritten))
+        changed_identity = thought_feed._identity_text(current.path, rewritten)
+        try:
+            event_id = memory_history.prepare_change(
+                root, "thought", identity, identity, raw, changed_identity, rewritten)
+        except (OSError, memory_history.HistoryError):
+            return Mutation(False, "⚠️ История недоступна — мысль не изменена.")
+        try:
+            inbox_core.atomic_write(path, rewritten)
+        except OSError:
+            memory_history.abort_change(root, event_id)
+            return Mutation(False, "Не смог исправить мысль.")
+        try:
+            memory_history.commit_change(root, event_id)
+        except (OSError, memory_history.HistoryError):
+            return Mutation(False, "⚠️ Мысль исправлена, но историю не удалось подтвердить.",
+                            True, "thought", rel, changed_identity)
+    changed = thought_feed.load_thought(root, changed_identity)
     return Mutation(True, "✏️ Мысль исправлена.", True, "thought", rel,
                     changed.identity if changed else "")
 
@@ -150,9 +166,24 @@ def _edit_inbox(root: Path, identity: str, text: str) -> Mutation:
         lines = raw.splitlines()
         lines[located["index"]] = new_line
         rewritten = "\n".join(lines) + ("\n" if raw.endswith("\n") else "")
-        inbox_core.atomic_write(path, rewritten)
+        changed_identity = thought_feed._identity_text(thought_feed.INBOX_REL, new_line)
+        try:
+            event_id = memory_history.prepare_change(
+                root, "thought", identity, identity, line, changed_identity, new_line)
+        except (OSError, memory_history.HistoryError):
+            return Mutation(False, "⚠️ История недоступна — мысль не изменена.")
+        try:
+            inbox_core.atomic_write(path, rewritten)
+        except OSError:
+            memory_history.abort_change(root, event_id)
+            return Mutation(False, "Не смог исправить мысль.")
+        try:
+            memory_history.commit_change(root, event_id)
+        except (OSError, memory_history.HistoryError):
+            return Mutation(False, "⚠️ Мысль исправлена, но историю не удалось подтвердить.",
+                            True, "inbox", thought_feed.INBOX_REL, changed_identity)
     return Mutation(True, "✏️ Мысль исправлена.", True, "inbox", thought_feed.INBOX_REL,
-                    thought_feed._identity_text(thought_feed.INBOX_REL, new_line))
+                    changed_identity)
 
 
 def _delete_structured(root: Path, identity: str) -> Mutation:

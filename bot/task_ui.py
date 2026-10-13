@@ -403,8 +403,15 @@ def _remember_position(state, identity: str) -> None:
 
 
 def _thought_view(state, thought, vault) -> "View":
+    import memory_history
     token = issue_thought_token(state, thought.identity)
     _remember_position(state, thought.identity)
+    past = memory_history.past_source(vault, thought.identity)
+    if past:
+        newer = issue_thought_token(state, past["newer_identity"])
+        return View("🕘 Прошлая версия · сохранено\n\n" + thought_feed.render_thought(thought),
+                    [[("Открыть актуальную", "f:o:" + newer)],
+                     [("🕘 История", "mh:h:t:" + token), ("↩️ Вернуть актуальность", "mh:u:" + past["id"])]])
     try:
         done = thought_status.get_done(vault, thought.identity)
     except thought_status.StatusError:
@@ -418,6 +425,7 @@ def _thought_view(state, thought, vault) -> "View":
         [("➡️ В задачу", f"f:t:{token}")],
         [("✏️ Исправить", f"f:e:{token}"), ("🗑 Удалить", f"f:d:{token}")],
         [("Скрыть на 7 дней", f"f:x:{token}"), ("⬅️ Назад", THOUGHT_HUB)],
+        [("🕘 История", f"mh:h:t:{token}"), ("Обновить прежнюю", f"mh:p:{token}")],
     ]
     return View(thought_feed.render_thought(thought), rows)
 
@@ -426,6 +434,7 @@ def _hub_rows() -> list:
     return [
         [("📥 Inbox", THOUGHT_INBOX), ("🆕 Последние", THOUGHT_RECENT)],
         [("💡 Вспомнить", THOUGHT_REMEMBER), ("🔎 Найти", THOUGHT_SEARCH)],
+        [("🧠 Поиск по смыслу", "ss:search")],
         [("📁 Сделанные", THOUGHT_DONE), ("💡 Разбор мыслей", "m:digest")],
     ]
 

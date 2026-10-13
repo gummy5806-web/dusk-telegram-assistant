@@ -109,6 +109,9 @@ class TransportBase(unittest.IsolatedAsyncioTestCase):
         self.appended = []
         self.synced = []
 
+        async def semantic_request(update, context, query):
+            await update.message.reply_text("Dusk: смысловой поиск", reply_markup=None)
+
         namespace = {
             "re": __import__("re"),
             "asyncio": asyncio,
@@ -127,6 +130,7 @@ class TransportBase(unittest.IsolatedAsyncioTestCase):
             "append_to_inbox": lambda text, kind="thought", private=False: (
                 self.appended.append(text) or "line"),
             "_related_hint": lambda text: "",
+            "_request_semantic": semantic_request,
             "reminder_nlp": reminder_nlp,
             "reminder_ui": reminder_ui,
             "_vault": lambda: self.root,

@@ -159,6 +159,7 @@ def _open(vault, identifier: str) -> ui.View:
         [("✏️ Исправить", f"rs:e:{record.id}:{record.version}"),
          ("🗑 Удалить", f"rs:d:{record.id}:{record.version}")],
         [("⬅️ Ресурсы", "rs:l:0")],
+        [("🕘 История", "mh:h:r:" + record.id)],
     ])
 
 
@@ -221,6 +222,7 @@ def _open_from_record(record: resources.Resource) -> ui.View:
         [("✏️ Исправить", f"rs:e:{record.id}:{record.version}"),
          ("🗑 Удалить", f"rs:d:{record.id}:{record.version}")],
         [("⬅️ Ресурсы", "rs:l:0")],
+        [("🕘 История", "mh:h:r:" + record.id)],
     ])
 
 

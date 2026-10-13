@@ -16,6 +16,7 @@ from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 import queue_store
+import memory_history
 
 RESOURCE_REL = "PARA/RESOURCES/Сохранённые ссылки"
 TRASH_REL = "SYSTEM/RESOURCE_TRASH"
@@ -192,7 +193,22 @@ def update(vault, identifier: str, version: str, description: str) -> Mutation:
         rewritten = _render(current.id, current.url, current.normalized_url, title, cleaned)
         if _version(rewritten) == current.version:
             return Mutation(True, "Ресурс уже содержит этот текст.", current, False)
-        queue_store.atomic_write(path, rewritten)
+        try:
+            raw = path.read_text(encoding="utf-8")
+            event_id = memory_history.prepare_change(
+                vault, "resource", current.id, current.id, raw, current.id, rewritten)
+        except (OSError, UnicodeDecodeError, memory_history.HistoryError):
+            return Mutation(False, "⚠️ История недоступна — ресурс не изменён.")
+        try:
+            queue_store.atomic_write(path, rewritten)
+        except OSError:
+            memory_history.abort_change(vault, event_id)
+            return Mutation(False, "⚠️ Не удалось исправить ресурс.")
+        try:
+            memory_history.commit_change(vault, event_id)
+        except (OSError, memory_history.HistoryError):
+            return Mutation(False, "⚠️ Ресурс исправлен, но историю не удалось подтвердить.",
+                            mutated=True)
     changed = load(vault, identifier)
     if changed is None:
         raise ResourceError("Не удалось обновить ресурс.")

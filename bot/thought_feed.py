@@ -273,7 +273,7 @@ def _structured_thoughts(root: Path, include_done=False):
             continue
         date = _parse_date(frontmatter.get(text, "created")) or _filename_date(path)
         identity = _identity_text(relative, text)
-        if not include_done and thought_status.is_done(root, identity):
+        if not include_done and (thought_status.is_done(root, identity) or _is_past(root, identity)):
             continue
         thoughts.append(Thought(
             identity=identity,
@@ -353,7 +353,7 @@ def inbox_counts(root=None) -> InboxCounts:
     if text is None:
         raise InboxReadError("Inbox существует, но безопасно не читается")
     sections = _parse_inbox_sections(text)
-    thoughts = sum(not thought_status.is_done(vault, _identity_text(INBOX_REL, line))
+    thoughts = sum(not thought_status.is_done(vault, _identity_text(INBOX_REL, line)) and not _is_past(vault, _identity_text(INBOX_REL, line))
                    for _stamp, _body, line in sections["thoughts"])
     tasks = len(sections["tasks"])
     links = len(sections["links"])
@@ -368,7 +368,7 @@ def _inbox_thoughts(root: Path, include_done=False):
     thoughts = []
     for stamp, body, line in _parse_inbox(text):
         identity = _identity_text(INBOX_REL, line)
-        if not include_done and thought_status.is_done(root, identity):
+        if not include_done and (thought_status.is_done(root, identity) or _is_past(root, identity)):
             continue
         thoughts.append(Thought(
             identity=identity,
@@ -388,12 +388,17 @@ def inbox_thoughts(root=None, limit: int = MAX_INBOX_RECENT):
     return list(reversed(items))[:max(1, int(limit))]
 
 
+def _is_past(root, identity):
+    import memory_history
+    return memory_history.is_past(root, identity)
+
+
 def _inbox_total(root: Path) -> int:
     path = root / INBOX_REL
     text = _safe_read(root, path)
     if text is None:
         return 0
-    return sum(not thought_status.is_done(root, _identity_text(INBOX_REL, line))
+    return sum(not thought_status.is_done(root, _identity_text(INBOX_REL, line)) and not _is_past(root, _identity_text(INBOX_REL, line))
                for _stamp, _body, line in _parse_inbox(text))
 
 

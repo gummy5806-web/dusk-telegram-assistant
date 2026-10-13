@@ -23,6 +23,7 @@ import frontmatter
 import llm
 import thought_feed
 import thought_status
+import memory_history
 
 
 INBOX_REL = Path("ZETA/FLEETING/00 Инбокс.md")
@@ -224,7 +225,7 @@ def _read_public_thoughts(root: Path, coverage: dict) -> tuple[list[dict], list[
                     coverage["omitted"] += 1
                     break
                 record = _inbox_record(line, index)
-                if _is_control_capture(record["text"]) or thought_status.is_done(root, record["identity"]):
+                if _is_control_capture(record["text"]) or (thought_status.is_done(root, record["identity"]) or memory_history.is_past(root, record["identity"])):
                     continue
                 if record["date"] == "UNKNOWN DAY":
                     coverage["undated_inbox"] += 1
@@ -256,7 +257,7 @@ def _read_public_thoughts(root: Path, coverage: dict) -> tuple[list[dict], list[
             continue
         record = _daily_record(path, raw, root, index)
         if (not record["text"] or _is_control_capture(record["text"])
-                or thought_status.is_done(root, record["identity"])):
+                or (thought_status.is_done(root, record["identity"]) or memory_history.is_past(root, record["identity"]))):
             continue
         if record["date"] == "UNKNOWN DAY":
             undated.append(record)

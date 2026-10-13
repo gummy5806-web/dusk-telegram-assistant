@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 import task_ui
+import memory_history
 import thought_feed
 
 
@@ -52,6 +53,17 @@ class ThoughtMutationTests(unittest.TestCase):
         self.assertIn("исправленный\nполный текст", saved)
         self.assertNotIn("старый полный текст", saved)
         self.assertFalse(task_ui.thought_edit_pending(self.state))
+
+    def test_edit_structured_records_exact_old_and_new_versions(self):
+        self.note("версия до")
+        identity = thought_feed.recent_thoughts(self.vault, 10)[0].identity
+        result = task_ui.submit_thought_edit(
+            {task_ui.THOUGHT_EDIT_KEY: identity}, self.vault, "версия после")
+        self.assertTrue(result.ok)
+        event = memory_history.history(self.vault, "thought", identity)[0]
+        self.assertEqual(event["status"], "committed")
+        self.assertIn("версия до", event["before"]["content"])
+        self.assertIn("версия после", event["after"]["content"])
 
     def test_edit_inbox_changes_only_unique_line_and_normalizes_multiline(self):
         self.inbox_text(["- **10:00** первая", "- **10:01** вторая"])

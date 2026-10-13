@@ -57,6 +57,11 @@ class VaultBase(unittest.TestCase):
 
 
 class StructuredVertexTests(unittest.TestCase):
+    def setUp(self):
+        usage = mock.patch("llm.ai_usage.record_call")
+        usage.start()
+        self.addCleanup(usage.stop)
+
     def test_vertex_passes_verified_sdk_schema_config(self):
         import llm
         client = mock.Mock()

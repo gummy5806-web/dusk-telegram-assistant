@@ -39,6 +39,13 @@ import assistant_router
 import personal_search
 import resource_ui
 import queue_store
+import ai_usage
+import memory_history
+import memory_history_ui
+import semantic_recall
+import semantic_search_jobs
+import queue_sync
+import secrets
 import speech_to_text
 import dispatch as _dispatch
 import runtime_store
@@ -256,6 +263,8 @@ def _clear_inputs(state):
     resource_ui.clear(state)
     state.pop("resource_add", None)
     state.pop("resource_search", None)
+    state.pop("semantic_input", None)
+    state.pop("memory_supersede_confirm", None)
 
 
 async def _remove_legacy_keyboard(update, context):
@@ -491,6 +500,7 @@ async def _digest_loop(application, stop, wake):
     # Separate local DB: durable acknowledgements, no personal text and no change
     # to the existing focus/reminder runtime schema.
     ledger = DeliveryLedger(runtime_store.default_db_path().with_name("thought-digest-delivery.sqlite3"))
+    assistant_ledger = DeliveryLedger(runtime_store.default_db_path().with_name("assistant-delivery.sqlite3"))
     while not stop.is_set():
         try:
             await asyncio.wait_for(wake.wait(), timeout=60)
@@ -503,6 +513,156 @@ async def _digest_loop(application, stop, wake):
             await _digest_tick(application, ledger)
         except Exception as error:
             logger.warning("digest delivery deferred: %s", type(error).__name__)
+        try:
+            await _assistant_tick(application, assistant_ledger)
+        except Exception as error:
+            logger.warning("assistant delivery deferred: %s", type(error).__name__)
+
+
+def _semantic_query_button(state, query):
+    token = secrets.token_hex(6)
+    saved = state.setdefault('semantic_queries', {})
+    saved[token] = query[:160]
+    while len(saved) > 64:
+        saved.pop(next(iter(saved)))
+    return ('🧠 Поиск по смыслу', 'ss:q:' + token)
+
+
+def _sync_assistant(path=None):
+    if path is not None:
+        return queue_sync.sync_paths(_vault(), [path])
+    return queue_sync.pull(_vault())
+
+
+async def _request_semantic(update, context, query):
+    try:
+        job = await asyncio.to_thread(semantic_search_jobs.enqueue, _vault(), query)
+        synced = await asyncio.to_thread(_sync_assistant, semantic_search_jobs.request_path(_vault(), job['id']))
+        text = '🧠 Ищу по смыслу в твоих мыслях, ресурсах и задачах. Ответ пришлю сюда; если Mac спит — после пробуждения.'
+        if not synced:
+            text += '\nЗапрос сохранён; передачу на Mac повторю.'
+    except (OSError, ValueError) as error:
+        logger.warning('semantic request failed: %s', type(error).__name__)
+        text = 'Не удалось поставить смысловой поиск в очередь. Записи сохранены; поиск по словам работает.'
+    _clear_inputs(context.user_data)
+    wake = context.bot_data.get('digest_wake')
+    if wake is not None:
+        wake.set()
+    await update.effective_message.reply_text(text, reply_markup=MAIN_KEYBOARD)
+
+
+async def _handle_semantic_callback(update, context, data):
+    if data == 'ss:search':
+        _clear_inputs(context.user_data)
+        context.user_data['semantic_input'] = True
+        await ui.safe_edit(update.callback_query, 'Что вспомнить? Опиши своими словами.', cancel_keyboard())
+        return
+    query = context.user_data.get('semantic_queries', {}).get(data[5:]) if data.startswith('ss:q:') else None
+    if query:
+        await _request_semantic(update, context, query)
+    else:
+        await ui.safe_edit(update.callback_query, 'Поиск устарел — напиши запрос заново.', MAIN_KEYBOARD)
+
+
+def _semantic_result_view(state, saved):
+    result = saved['result']
+    if result.get('error'):
+        return ui.View('🧠 Поиск по смыслу пока недоступен. Поиск по словам продолжает работать.', [])
+    hits = [hit for hit in result.get('hits', []) if semantic_recall.validate_hit(_vault(), hit)]
+    if not hits:
+        text = '🧠 По смыслу подходящих записей не нашёл. Уточни запрос; случайные мысли не подставляю.'
+        if result.get('coverage', {}).get('partial', False):
+            text += '\nЧасть записей ещё не проиндексирована; подборка пока неполная.'
+        return ui.View(text, [])
+    lines = ['🧠 Нашёл по смыслу', '']; rows = []
+    for index, hit in enumerate(hits[:6], 1):
+        lines.append(f"{index}. {hit['title'][:120]}\n{hit['excerpt'][:300]}\n")
+        if hit['kind'] == 'thought':
+            data = 'f:o:' + ui.issue_thought_token(state, hit['identity'])
+        elif hit['kind'] == 'resource':
+            data = 'rs:o:' + hit['identity']
+        else:
+            data = 't:' + ui.issue_token(state, str(_vault() / hit['path']))
+        rows.append([(f"{index}. {hit['title'][:40]}", data)])
+    coverage = result.get('coverage', {})
+    if coverage.get('partial', False):
+        lines.append('Подборка пока неполная: часть записей ещё не проиндексирована.')
+    return ui.View('\n'.join(lines)[:3900], rows)
+
+
+async def _assistant_tick(application, ledger):
+    requests = await asyncio.to_thread(semantic_search_jobs.requests, _vault())
+    await asyncio.to_thread(_sync_assistant)
+    delivered = 0
+    for request in requests:
+        if await asyncio.to_thread(ledger.contains, request['id']):
+            continue
+        saved = await asyncio.to_thread(semantic_search_jobs.get_result, _vault(), request['id'])
+        if saved is None:
+            await asyncio.to_thread(_sync_assistant, semantic_search_jobs.request_path(_vault(), request['id']))
+            continue
+        state = application.user_data.get(ALLOWED_USER, {})
+        view = await asyncio.to_thread(_semantic_result_view, state, saved)
+        await application.bot.send_message(chat_id=ALLOWED_USER, text=view.text, reply_markup=_inline(view) or MAIN_KEYBOARD)
+        await asyncio.to_thread(ledger.mark, request['id'])
+        delivered += 1
+        if delivered >= 5:
+            break
+    if _now().astimezone(ai_usage.ALMATY).hour >= 9:
+        notice = await asyncio.to_thread(ai_usage.daily_notice, _vault(), _now())
+        if notice and not await asyncio.to_thread(ledger.contains, notice[0]):
+            await application.bot.send_message(chat_id=ALLOWED_USER, text=notice[1], reply_markup=MAIN_KEYBOARD)
+            await asyncio.to_thread(ledger.mark, notice[0])
+
+
+async def _handle_memory_callback(update, context, data):
+    state = context.user_data; parts = data.split(':')
+    pending = state.get('memory_supersede_confirm')
+    _clear_inputs(state)
+    view = ui.View('Кнопка истории устарела — открой запись заново.', [])
+    if len(parts) == 4 and parts[1] == 'h' and parts[2] in {'t', 'r'}:
+        kind = 'thought' if parts[2] == 't' else 'resource'
+        ref = ui.resolve_thought_token(state, parts[3]) if kind == 'thought' else parts[3]
+        if ref:
+            view = await asyncio.to_thread(memory_history_ui.view, _vault(), kind, ref)
+            back = 'f:o:' + parts[3] if kind == 'thought' else 'rs:o:' + parts[3]
+            view.rows = [[('⬅️ К записи', back)]]
+    elif len(parts) == 3 and parts[1] == 'p':
+        new = ui.resolve_thought_token(state, parts[2])
+        items = thought_feed.inbox_thoughts(_vault(), 10) + thought_feed.recent_thoughts(_vault(), 10)
+        rows = [[(item.title[:45], f"mh:s:{parts[2]}:{ui.issue_thought_token(state, item.identity)}")]
+                for item in items if item.identity != new and not memory_history.is_past(_vault(), item.identity)] if new else []
+        view = ui.View('Какую прежнюю мысль заменяет эта? Если это отдельная идея — оставь обе.',
+                       rows[:15] + [[('Оставить обе · отмена', 'f:o:' + parts[2])]])
+    elif len(parts) == 4 and parts[1] == 's':
+        new = ui.resolve_thought_token(state, parts[2]); old = ui.resolve_thought_token(state, parts[3])
+        if new and old:
+            try:
+                proposal = await asyncio.to_thread(memory_history.prepare_supersede, _vault(), old, new)
+                older = thought_feed.load_thought(_vault(), old)
+                newer = thought_feed.load_thought(_vault(), new)
+                if older is None or newer is None:
+                    raise memory_history.HistoryError('Мысль изменилась — выбери записи заново.')
+            except (memory_history.HistoryError, OSError) as error:
+                logger.warning('memory proposal unavailable: %s', type(error).__name__)
+                view = ui.View('Мысль изменилась или недоступна — открой записи заново.',
+                               [[('🧠 Мысли', ui.THOUGHT_HUB)]], stale=True)
+            else:
+                state['memory_supersede_confirm'] = proposal['id']
+                view = ui.View('Прежняя:\n' + older.excerpt + '\n\nНовая:\n' + newer.excerpt +
+                               '\n\nОтметить прежнюю как прошлую? Обе записи сохранятся.',
+                               [[('Подтвердить', 'mh:c:' + proposal['id']), ('Оставить обе', 'f:o:' + parts[2])]])
+    elif len(parts) == 3 and parts[1] == 'c' and pending == parts[2]:
+        result = await asyncio.to_thread(memory_history.commit_supersede, _vault(), parts[2])
+        if result.mutated:
+            await asyncio.to_thread(_sync_note)
+        view = ui.View(result.message, [[('↩️ Вернуть актуальность', 'mh:u:' + parts[2])]] if result.ok else [])
+    elif len(parts) == 3 and parts[1] == 'u':
+        result = await asyncio.to_thread(memory_history.restore_current, _vault(), parts[2])
+        if result.mutated:
+            await asyncio.to_thread(_sync_note)
+        view = ui.View(result.message, [[('🧠 Мысли', ui.THOUGHT_HUB)]])
+    await ui.safe_edit(update.callback_query, view.text, _inline(view) or MAIN_KEYBOARD)
 
 
 async def _maybe_menu_reminder(update, context, text):
@@ -620,7 +780,7 @@ async def _show_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def _personal_status_text() -> str:
     summary = personal_summary.collect(_vault(), _runtime_store(), _now())
-    return personal_summary.render(summary)
+    return personal_summary.render(summary)[:3000] + "\n\n" + ai_usage.render(_vault())
 
 
 async def _show_inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -787,6 +947,9 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
 
     if await _maybe_menu_reminder(update, context, text):
         return
+    if state.get("semantic_input"):
+        await _request_semantic(update, context, text)
+        return
     if resource_ui.edit_pending(state):
         view = await asyncio.to_thread(resource_ui.submit_edit, _vault(), state, text, sync=_sync_note)
         await update.message.reply_text(view.text, reply_markup=_inline(view) or MAIN_KEYBOARD)
@@ -932,9 +1095,18 @@ async def handle_content(update: Update, context: ContextTypes.DEFAULT_TYPE,
         return
 
     if route.kind == assistant_router.KIND_PERSONAL_SEARCH:
-        view = await asyncio.to_thread(resource_ui.search_view, _vault(), route.subject or text)
+        subject = route.subject or text
+        hits = await asyncio.to_thread(personal_search.search, subject, vault=_vault())
+        if not hits:
+            if not personal_search._terms(subject):
+                await update.message.reply_text(personal_search.render([]), reply_markup=MAIN_KEYBOARD)
+                return
+            await _request_semantic(update, context, subject)
+            return
+        view = await asyncio.to_thread(resource_ui.search_view, _vault(), subject)
+        view.rows.append([_semantic_query_button(state, subject)])
         await update.message.reply_text(
-            search_answer(route.subject or text, False), reply_markup=_inline(view) or MAIN_KEYBOARD)
+            personal_search.render(hits), reply_markup=_inline(view) or MAIN_KEYBOARD)
         return
 
     if route.kind == assistant_router.KIND_KNOWLEDGE_SEARCH:
@@ -1129,6 +1301,12 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         if data.startswith("rs:"):
             await _handle_resource_callback(update, context, data)
+            return
+        if data.startswith("ss:"):
+            await _handle_semantic_callback(update, context, data)
+            return
+        if data.startswith("mh:"):
+            await _handle_memory_callback(update, context, data)
             return
         if data == "x":
             _clear_inputs(state)

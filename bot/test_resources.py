@@ -3,6 +3,7 @@ import unittest
 from pathlib import Path
 
 import personal_search
+import memory_history
 import resources
 
 
@@ -86,6 +87,15 @@ class ResourceStoreTests(unittest.TestCase):
         result = resources.restore(self.vault, "a" * 24)
         self.assertTrue(result.stale)
         self.assertFalse((self.vault / "SYSTEM").exists())
+
+    def test_update_records_a_committed_history_snapshot(self):
+        saved = resources.save(self.vault, "https://safe.example/history", "до").resource
+        result = resources.update(self.vault, saved.id, saved.version, "после")
+        self.assertTrue(result.ok)
+        event = memory_history.history(self.vault, "resource", saved.id)[0]
+        self.assertEqual(event["status"], "committed")
+        self.assertIn("до", event["before"]["content"])
+        self.assertIn("после", event["after"]["content"])
 
 
 if __name__ == "__main__":

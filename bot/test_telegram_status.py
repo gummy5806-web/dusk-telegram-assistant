@@ -52,6 +52,7 @@ class StatusTextTests(unittest.TestCase):
         self.addCleanup(self.store.close)
         self.function = load_function(TELEGRAM, "_personal_status_text", {
             "personal_summary": personal_summary,
+            "ai_usage": __import__("ai_usage"),
             "_vault": lambda: self.root,
             "_runtime_store": lambda: self.store,
             "_now": lambda: NOW,
@@ -73,6 +74,7 @@ class StatusTextTests(unittest.TestCase):
         self.make_task("Задача.md")
         namespace = {
             "personal_summary": personal_summary,
+            "ai_usage": __import__("ai_usage"),
             "_vault": lambda: self.root,
             "_runtime_store": lambda: None,
             "_now": lambda: NOW,
