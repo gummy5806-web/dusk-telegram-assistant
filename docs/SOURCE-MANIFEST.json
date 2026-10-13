@@ -1,5 +1,5 @@
 {
-  "vault_head": "a82391302d0cac7b7cefc2422f8db1689caf9a5d",
+  "vault_head": "dddd63ebb3e534e50a0308b666926ca7e7cc4d1a",
   "desktop_head": "452e7789c0dc9671870c3c608e9dd4dca270074a",
   "files": [
     {
@@ -343,7 +343,7 @@
     {
       "path": "bot/llm.py",
       "source": "~/Documents/obsidian/my dusk/bot/llm.py",
-      "sha256": "26ed098f6d0d58702f381e3ba4e1bff3c490505b4e209d91c401d636abe51e5e",
+      "sha256": "f0b373ba13c93d5f955d73a72536e233bc7b7a862980460d852d13c7f513d212",
       "initial_source_sha256": "f49470242a4fe056510b22936d23babc85f6cf8eefd09f956c9a6eefed60177e",
       "updated": "2026-10-10 thought-digest"
     },
@@ -365,7 +365,7 @@
     {
       "path": "bot/personal_search.py",
       "source": "~/Documents/obsidian/my dusk/bot/personal_search.py",
-      "sha256": "bccd2bbc7fb9ba4194160913faad8fe5512e276c15806c4799beb490efeab080"
+      "sha256": "ade0f72a80f89d351c827c9c472823b48a4aea96978f4d2d2dbf3f7d5ea55f89"
     },
     {
       "path": "bot/personal_summary.py",
@@ -445,14 +445,14 @@
     {
       "path": "bot/task_ui.py",
       "source": "~/Documents/obsidian/my dusk/bot/task_ui.py",
-      "sha256": "56b31439823a858db4158b2d7456b10cfbc57c311b87d524737b80d56398d25c",
+      "sha256": "bfc37ad9bbbbdbb4752f7ee90aed5f985e5fcbab72b877cf04a83aaa246ed68e",
       "initial_source_sha256": "4922d2e4015cdf8c01605da3604669b3f17cbb14dde69aa54bf6d9e794e938b4",
       "updated": "2026-10-13"
     },
     {
       "path": "bot/telegram_bot.py",
       "source": "~/Documents/obsidian/my dusk/bot/telegram_bot.py",
-      "sha256": "338d0799ca349bd192013b9f85f554b2fff066bc3a7989a3e91e3c0e9e944477",
+      "sha256": "5eeac57a86e552928eca3ab2d873b179d58d86715f33ce08b454f8b4613d6ca3",
       "initial_source_sha256": "aca3a7776b739113474e75636e5fb90aa167b018aa2580827e482750f81888cf",
       "updated": "2026-10-13"
     },
@@ -489,7 +489,7 @@
     {
       "path": "bot/test_personal_assistant_flow.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_personal_assistant_flow.py",
-      "sha256": "6b3a408f824a3b69756e8a334b7c9e7deefdc8ebc00bd410dc016b62cae6e68b",
+      "sha256": "af3448030796535445fe11c0b1ca4e95e493f8710a9fee8b906ca8a8e777f4d7",
       "initial_source_sha256": "b7eed59e5cc0efdd15f9f1f10b74aa10fca1aa23bca6a7c8cf3d4e8f63a41414",
       "updated": "2026-10-13"
     },
@@ -531,7 +531,7 @@
     {
       "path": "bot/test_reminder_transport_runtime.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_reminder_transport_runtime.py",
-      "sha256": "551a310b6637021314ac0dfe6d765701f61bca29276383f8cba739d233ae5c92",
+      "sha256": "5a5ec453eb3ebe7da844e5f0a2353d64ecf83c040787edff575f7df24d10b135",
       "initial_source_sha256": "e9570dc5a345c18ce30e520fffb16197ecd2e41cc226402648e8dcc7647c7e47",
       "updated": "2026-10-13"
     },
@@ -652,7 +652,7 @@
     {
       "path": "bot/test_telegram_status.py",
       "source": "~/Documents/obsidian/my dusk/bot/test_telegram_status.py",
-      "sha256": "1099cf576cd44b269bbc220b9da9e1d778d57f7f910eb38199a47f0c72638e28"
+      "sha256": "922e5912cb282437fabaa9d388d7102b3f997b07af07a46c85231ef4cfa48057"
     },
     {
       "path": "bot/test_telegram_ux.py",
@@ -696,7 +696,7 @@
     {
       "path": "bot/thought_feed.py",
       "source": "~/Documents/obsidian/my dusk/bot/thought_feed.py",
-      "sha256": "c987da0101e41f6f18a0dd1fccc7ac2d7fed839320d8dbd7f6f9fe6a135fec1d",
+      "sha256": "1c11ac65fda71dabba23fa3370f611f9f9ce3a8182550c999a2f639b9f794fac",
       "initial_source_sha256": "91b06636049bc806b91f52e941bd13c356253dc71ec8d81b965fe2fd32e553d3",
       "updated": "2026-10-10 thought-lifecycle"
     },
@@ -708,7 +708,7 @@
     {
       "path": "bot/triage.py",
       "source": "~/Documents/obsidian/my dusk/bot/triage.py",
-      "sha256": "d4e941178a34e10cb4b7a3c0a3642360f53aa296a682eb10ce163ab8bc50ff78",
+      "sha256": "d0d5e575c4c72efec5c290ba59f7e0d23887de1df3f37840cf0268e55315e066",
       "initial_source_sha256": "66b122774c0ad71ae3a0044a48af1a214da45766c392341b2a4a31b585fa73e1",
       "updated": "2026-10-10 thought-lifecycle"
     },
@@ -968,6 +968,156 @@
       "path": "deploy/deepgram/deepgram_proxy.py",
       "source": "VPS:/opt/dsh/deepgram_proxy.py",
       "sha256": "0cf35becc185b2165ede9d9beee54f47db295f6478fba70ad38751e3f34e4c69"
+    },
+    {
+      "path": "bot/resource_ui.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/resource_ui.py",
+      "sha256": "4b38cd639a422cdba3cd00d7eb0dd8470f19a8918ef5193d7fc3ca56a72dbc38"
+    },
+    {
+      "path": "bot/resources.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/resources.py",
+      "sha256": "5d4cf0e57dd8001fb40e9bfe6d6c28146db91829538e9cdd166e5cccd05692a9"
+    },
+    {
+      "path": "bot/test_resources.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_resources.py",
+      "sha256": "257b16b4e78ea2cc12b59c40dc29a5816059fab4c2fa042b637f00b041090426"
+    },
+    {
+      "path": "bot/test_thought_digest.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_thought_digest.py",
+      "sha256": "372e7ceaf72129c99a938976eab1d3beed22f744c64afabe204fd3eec7e99da2"
+    },
+    {
+      "path": "bot/test_thought_digest_jobs.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_thought_digest_jobs.py",
+      "sha256": "4b310df22f387121809ac7336c52ebf282153786c5be6203d88e8f4843790973"
+    },
+    {
+      "path": "bot/test_thought_mutations.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_thought_mutations.py",
+      "sha256": "176bf6f2913c2600108e2a96ef8793c4ca04b506e9ea5a05ec6960de357db706"
+    },
+    {
+      "path": "bot/thought_digest.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/thought_digest.py",
+      "sha256": "6d628c54ef57761b13b4163fe70e9b631ddd194e9317fdd587884b49510d87d9"
+    },
+    {
+      "path": "bot/thought_digest_worker.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/thought_digest_worker.py",
+      "sha256": "2cfb21960b756227552a06678f27b9d2e2c13947e18226a7636d8c8dd55e41c4"
+    },
+    {
+      "path": "bot/thought_mutations.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/thought_mutations.py",
+      "sha256": "2f47ec7b2107590ca85f47394e0ea0cd3382ebd6163429c1b6dcc47a1d68fa22"
+    },
+    {
+      "path": "bot/ai_usage.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/ai_usage.py",
+      "sha256": "10a3d1ff198ea7dce39406082c3dceb2a5b513f86f9ea63023abe2acb30f2881"
+    },
+    {
+      "path": "bot/assistant_jobs.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/assistant_jobs.py",
+      "sha256": "9989c15db99283df0f2544988e43573dd3d6b0320a2d3c4e8a5d06f0cf280eab"
+    },
+    {
+      "path": "bot/llm_embeddings.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/llm_embeddings.py",
+      "sha256": "553ff9376d0dd4174423719d521f86d49cfb7cb7e23de47616cf925f6efa6d2d"
+    },
+    {
+      "path": "bot/memory_history.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/memory_history.py",
+      "sha256": "da6fae05e574c31257b29370c9571e6bc6d0dd1d493d92207d0a2abbfc34c0a6"
+    },
+    {
+      "path": "bot/memory_history_ui.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/memory_history_ui.py",
+      "sha256": "9f0d6b15f7ddfb793da2ce8f5742073f33f3c73352f8d477c37f3d6b8a19a7dd"
+    },
+    {
+      "path": "bot/queue_sync.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/queue_sync.py",
+      "sha256": "b05fcc4ce8edcf46bb5f8a814b2f8292c046eb8620fcd3ca3f253092c32f67e7"
+    },
+    {
+      "path": "bot/semantic_recall.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/semantic_recall.py",
+      "sha256": "35a7e623c1fa67b78e1e2e883a3831fee12df3aa08dbec8abd0dff7405b8f0e4"
+    },
+    {
+      "path": "bot/semantic_search_jobs.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/semantic_search_jobs.py",
+      "sha256": "a71f1ef43575135080745375f4f7eaa8a3c8e4fc02320cf97f78cc968a40d92a"
+    },
+    {
+      "path": "bot/test_ai_usage.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_ai_usage.py",
+      "sha256": "250a46625c5abbfc882a18d45a10c380c1b912e01d7a8a2d73bc56d117896fcf"
+    },
+    {
+      "path": "bot/test_assistant_delivery.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_assistant_delivery.py",
+      "sha256": "8de8d58022e74574a62391b4a224634f08dd5d40e9f51182f72a4d094cbb4123"
+    },
+    {
+      "path": "bot/test_assistant_jobs.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_assistant_jobs.py",
+      "sha256": "8026ea62f85a9307ff47433776988f9f7d693ac5779c145c2a4dcbf442570f63"
+    },
+    {
+      "path": "bot/test_llm_embeddings.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_llm_embeddings.py",
+      "sha256": "b6b356e8579fc363f577be893a404b1475720cc696fc86c4ed305d8ceefb0bc6"
+    },
+    {
+      "path": "bot/test_memory_history.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_memory_history.py",
+      "sha256": "12b262fb872230d31952433f057b86adc3df739024ff4eca366e2d8110bf80c3"
+    },
+    {
+      "path": "bot/test_memory_history_ui.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_memory_history_ui.py",
+      "sha256": "366a6595e102e8fa3b6bd8ddf74d20f424474f91c383fb567a9fcbc20193b480"
+    },
+    {
+      "path": "bot/test_memory_recall_transport.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_memory_recall_transport.py",
+      "sha256": "38a3364ff46acc88d2ebd670c5ffff1ec3785bdf7306f45b59f34f3e5fb6f658"
+    },
+    {
+      "path": "bot/test_past_memory_sources.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_past_memory_sources.py",
+      "sha256": "f3d492d0486c7c1ae4a1db3026a2dd098c26e78f1453b6b5b11be0c5d84f531d"
+    },
+    {
+      "path": "bot/test_queue_sync.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_queue_sync.py",
+      "sha256": "c659aea879b182facaa8c00bb42abc76b7164161c3fbca3b8d7e1cc54dbbf54f"
+    },
+    {
+      "path": "bot/test_semantic_recall.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_semantic_recall.py",
+      "sha256": "f9acf7dea91f69ccf4a633213c82e8dad6a2d7790788753d69bb06ef5b1447f8"
+    },
+    {
+      "path": "bot/test_semantic_search_jobs.py",
+      "source": "~/Documents/Codex/dusk-assistant/bot/test_semantic_search_jobs.py",
+      "sha256": "b67674790bd0d22ae79af4a59a83c840ab1a5648a8a636469967c0862d2785f4"
+    },
+    {
+      "path": "README.md",
+      "source": "~/Documents/Codex/dusk-assistant/README.md",
+      "sha256": "7aa1f877a9a68d7a922218cf0e78e7a5e80f885dfa8cedde74887da177c654e6"
+    },
+    {
+      "path": "docs/history/2026-10-14-memory-recall-accounting.md",
+      "source": "~/Documents/Codex/dusk-assistant/docs/history/2026-10-14-memory-recall-accounting.md",
+      "sha256": "24133a72a849f26b34fac762fe56cadeadcac844c2f320a0d44616d426c9354e"
     }
   ],
   "sanitized": [
