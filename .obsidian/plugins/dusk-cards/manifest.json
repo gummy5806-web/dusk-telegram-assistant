@@ -1,9 +1,9 @@
 {
   "id": "dusk-cards",
   "name": "Dusk Cards",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "minAppVersion": "1.0.0",
-  "description": "Карточки TaskNotes: A+ задача, «дописать», поля, помодоро 15/25/45/60 с нативной панелью, метка «в фоне»",
+  "description": "Карточки TaskNotes: меню ⋯ (A+, дописать, поля, помодоро с нативной панелью, фон, статус), полосы фокуса/фона",
   "author": "asan",
   "isDesktopOnly": false
 }

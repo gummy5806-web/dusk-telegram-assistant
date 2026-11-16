@@ -1,73 +1,54 @@
-/* Ряд действий под карточкой: не перекрывает заголовок и метаданные */
+/* Одна кнопка-меню на карточке: не занимает место и не мешает drag */
 
 .kanban-view__card-wrapper {
   position: relative;
 }
 
-.dusk-tools {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 6px 6px;
-  position: relative;
-  z-index: 5;
+/* резерв под кнопку, чтобы длинный заголовок не уходил под неё */
+.kanban-view__card-wrapper .task-card__title {
+  padding-right: 36px;
 }
 
-.dusk-advance,
-.dusk-tool {
-  position: static;
-  height: 24px;
+.dusk-menu {
+  position: absolute;
+  top: 6px;
+  right: 6px;
   min-width: 26px;
+  height: 24px;
   padding: 0 6px;
   border-radius: 999px;
   border: 1px solid var(--background-modifier-border);
   background: var(--background-secondary);
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1;
   cursor: pointer;
   opacity: 0.9;
   transition: opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+  z-index: 5;
+  font-variant-numeric: tabular-nums;
 }
 
-.dusk-advance {
-  font-size: 14px;
-}
-
-.dusk-advance:hover,
-.dusk-tool:hover {
+.dusk-menu:hover {
+  background: var(--color-accent);
   border-color: var(--color-accent);
-  color: var(--text-normal);
+  color: #fff;
 }
 
-.dusk-pomo.is-running {
+.dusk-menu.is-running {
   background: var(--color-green);
   border-color: var(--color-green);
   color: #fff;
-  font-variant-numeric: tabular-nums;
   font-weight: 600;
 }
 
-.dusk-pomo.is-paused {
-  background: var(--color-yellow);
-  border-color: var(--color-yellow);
-  color: var(--text-on-accent);
-  font-variant-numeric: tabular-nums;
-}
-
-.dusk-bg.is-background {
-  background: var(--color-purple);
-  border-color: var(--color-purple);
-  color: #fff;
-}
-
-/* Карточка в фоне (агенты/ожидание): не затемняем текст — фиолетовая полоса слева */
+/* Карточка в фоне: не затемняем текст — фиолетовая полоса слева */
 .kanban-view__card-wrapper.dusk-background-card .task-card {
   opacity: 1;
   filter: none;
   box-shadow: inset 3px 0 0 var(--color-purple);
   border-radius: 8px;
+  padding-left: 10px;
 }
 
 .kanban-view__card-wrapper.dusk-background-card:hover .task-card {
@@ -84,11 +65,13 @@
 .kanban-view__card-wrapper.dusk-focus-card .task-card {
   box-shadow: inset 3px 0 0 var(--color-accent);
   border-radius: 8px;
+  padding-left: 10px;
 }
 
-/* ---------- «Дописать к задаче» ---------- */
+/* ---------- модалки ---------- */
 
-.dusk-append-modal .dusk-append-subject {
+.dusk-append-modal .dusk-append-subject,
+.dusk-aplus-modal .dusk-append-subject {
   color: var(--text-muted);
   margin: 0 0 10px;
   font-size: 0.95em;
@@ -105,23 +88,6 @@
   justify-content: flex-end;
   gap: 8px;
   margin-top: 12px;
-}
-
-/* NONE-колонку скрываем по её data-атрибуту: карточек там нет (после
-   исключения DAILY/ZETA/PARA из сканирования), но hideEmptyColumns
-   на колонку none не действует — известный баг TaskNotes. */
-.kanban-view__column[data-column="none"],
-.kanban-view__column[data-column-key="none"],
-.kanban-view__column--uncategorized {
-  display: none !important;
-}
-
-/* ---------- A+ задача ---------- */
-
-.dusk-aplus {
-  font-weight: 600;
-  font-size: 11px;
-  letter-spacing: 0.02em;
 }
 
 .dusk-aplus-modal .dusk-aplus-hint {
@@ -144,4 +110,13 @@
 .dusk-aplus-modal .dusk-aplus-input {
   width: 100%;
   resize: vertical;
+}
+
+/* NONE-колонку скрываем по её data-атрибуту: карточек там нет (после
+   исключения DAILY/ZETA/PARA из сканирования), но hideEmptyColumns
+   на колонку none не действует — известный баг TaskNotes. */
+.kanban-view__column[data-column="none"],
+.kanban-view__column[data-column-key="none"],
+.kanban-view__column--uncategorized {
+  display: none !important;
 }
