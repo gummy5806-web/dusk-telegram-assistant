@@ -1,6 +1,6 @@
 'use strict';
 
-const { Plugin, Notice } = require('obsidian');
+const { Plugin, Notice, Menu } = require('obsidian');
 
 // Жизненный цикл колонок; на «done» кнопка возвращает задачу в «open» (undo).
 const STATUS_ORDER = ['open', 'next', 'in-progress', 'done'];
@@ -10,6 +10,7 @@ const WORK_MODE_KEY = 'workMode';
 const WORK_FOCUS = 'focus';
 const WORK_BACKGROUND = 'background';
 const POMODORO_MINUTES = 25;
+const POMODORO_CHOICES = [25, 15, 45, 60];
 const TASKS_FOLDER = 'TaskNotes/Tasks/';
 
 // ---------- разбор и правка frontmatter (без YAML-зависимостей) ----------
@@ -142,12 +143,12 @@ class DuskCardsPlugin extends Plugin {
     pomo.className = 'dusk-tool dusk-pomo';
     pomo.type = 'button';
     pomo.textContent = '🍅';
-    pomo.title = 'Помодоро 25 минут на эту задачу (повторный клик — стоп)';
+    pomo.title = 'Помодоро на эту задачу: выбор 15/25/45/60 (повторный клик — стоп)';
     this.bindNoDrag(pomo);
     pomo.addEventListener('click', async (e) => {
       e.stopPropagation();
       e.preventDefault();
-      await this.runAction(() => this.onPomodoroClick(path));
+      await this.runAction(() => this.onPomodoroClick(path, e));
     });
     tools.appendChild(pomo);
 
@@ -233,7 +234,7 @@ class DuskCardsPlugin extends Plugin {
         : 'Помодоро на паузе — клик, чтобы остановить';
     } else {
       if (btn.textContent !== '🍅') btn.textContent = '🍅';
-      btn.title = 'Помодоро 25 минут на эту задачу';
+      btn.title = 'Помодоро на эту задачу: 15/25/45/60 минут';
     }
   }
 
@@ -278,7 +279,7 @@ class DuskCardsPlugin extends Plugin {
     this.scheduleDecorate(true);
   }
 
-  async onPomodoroClick(path) {
+  async onPomodoroClick(path, evt) {
     const tn = this.getTaskNotes();
     if (!tn) {
       new Notice('TaskNotes не загружен — помодоро недоступен');
@@ -295,14 +296,39 @@ class DuskCardsPlugin extends Plugin {
       new Notice('Сначала останови текущий помодоро: ' + (this.taskTitle(other) || 'другая задача'));
       return;
     }
+    this.showDurationMenu(path, evt);
+  }
+
+  showDurationMenu(path, evt) {
+    const menu = new Menu();
+    for (const minutes of POMODORO_CHOICES) {
+      menu.addItem((item) => {
+        item.setTitle('🍅 ' + minutes + ' минут');
+        if (minutes === POMODORO_MINUTES) item.setIcon('flame');
+        item.onClick(() => this.runAction(() => this.startPomodoro(path, minutes)));
+      });
+    }
+    if (evt) {
+      menu.showAtMouseEvent(evt);
+    } else {
+      menu.showAtPosition({ x: 200, y: 200 });
+    }
+  }
+
+  async startPomodoro(path, minutes) {
+    const tn = this.getTaskNotes();
+    if (!tn) {
+      new Notice('TaskNotes не загружен — помодоро недоступен');
+      return;
+    }
     const task = await tn.cacheManager.getTaskInfo(path);
     if (!task) {
       new Notice('TaskNotes пока не видит задачу — обнови борд');
       return;
     }
     await this.setFocus(path);
-    await tn.pomodoroService.startPomodoro(task, POMODORO_MINUTES);
-    new Notice('🍅 25 минут: ' + (task.title || this.taskTitle(path)));
+    await tn.pomodoroService.startPomodoro(task, minutes);
+    new Notice('🍅 ' + minutes + ' минут: ' + (task.title || this.taskTitle(path)));
   }
 
   async toggleBackground(path) {
@@ -357,6 +383,7 @@ DuskCardsPlugin._test = {
   WORK_FOCUS,
   WORK_BACKGROUND,
   POMODORO_MINUTES,
+  POMODORO_CHOICES,
 };
 
 module.exports = DuskCardsPlugin;
