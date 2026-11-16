@@ -112,6 +112,67 @@ class AppendTaskModal extends Modal {
   }
 }
 
+class APlusModal extends Modal {
+  constructor(app, plugin, path, title, values) {
+    super(app);
+    this.plugin = plugin;
+    this.path = path;
+    this.taskTitle = title || path.split('/').pop().replace(/\.md$/, '');
+    this.values = values || {};
+  }
+
+  field(label, key, placeholder, rows) {
+    const wrap = this.contentEl.createDiv({ cls: 'dusk-aplus-field' });
+    wrap.createEl('label', { text: label, cls: 'dusk-aplus-label' });
+    const ta = wrap.createEl('textarea', { cls: 'dusk-aplus-input' });
+    ta.rows = rows || 2;
+    ta.placeholder = placeholder;
+    ta.value = this.values[key] || '';
+    return ta;
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.addClass('dusk-aplus-modal');
+    contentEl.createEl('h2', { text: 'A+ задача' });
+    contentEl.createEl('div', { text: this.taskTitle, cls: 'dusk-append-subject' });
+    contentEl.createEl('div', {
+      text: 'Одно узкое место. Остальное — не сейчас.',
+      cls: 'dusk-aplus-hint',
+    });
+    this.why = this.field('Какое одно узкое место снимает', 'aPlus',
+      'Например: парсер без нормального рантайма — блокирует всю ленту', 2);
+    this.proof = this.field('Чем докажу прогресс', 'aProof',
+      'Наблюдаемый результат: что должно стать правдой', 2);
+    this.notDoing = this.field('Что сознательно не делаю', 'aNotDoing',
+      'Список того, что отпускаю на этот сезон', 2);
+    const row = contentEl.createDiv({ cls: 'dusk-append-actions' });
+    const cancel = row.createEl('button', { text: 'Отмена' });
+    cancel.addEventListener('click', () => this.close());
+    const save = row.createEl('button', { text: 'Сохранить', cls: 'mod-cta' });
+    save.addEventListener('click', () => this.save());
+    window.setTimeout(() => this.why.focus(), 0);
+  }
+
+  async save() {
+    try {
+      await this.plugin.saveAPlus(this.path, {
+        aPlus: this.why.value.trim(),
+        aProof: this.proof.value.trim(),
+        aNotDoing: this.notDoing.value.trim(),
+      });
+      new Notice('A+ задача сохранена');
+      this.close();
+    } catch (err) {
+      new Notice('Не удалось сохранить A+: ' + (err && err.message ? err.message : String(err)));
+    }
+  }
+
+  onClose() {
+    this.contentEl.empty();
+  }
+}
+
 class DuskCardsPlugin extends Plugin {
   async onload() {
     this._decorateTimer = null;
@@ -190,6 +251,19 @@ class DuskCardsPlugin extends Plugin {
   addTools(card, path) {
     const tools = document.createElement('div');
     tools.className = 'dusk-tools';
+
+    const aplus = document.createElement('button');
+    aplus.className = 'dusk-tool dusk-aplus';
+    aplus.type = 'button';
+    aplus.textContent = 'A+';
+    aplus.title = 'A+ задача: узкое место, доказательство, что не делаю';
+    this.bindNoDrag(aplus);
+    aplus.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      this.openAPlusModal(path);
+    });
+    tools.appendChild(aplus);
 
     const append = document.createElement('button');
     append.className = 'dusk-tool dusk-append';
@@ -325,6 +399,59 @@ class DuskCardsPlugin extends Plugin {
     }
   }
 
+  openAPlusModal(path) {
+    const file = this.app.vault.getAbstractFileByPath(path);
+    const cache = file ? this.app.metadataCache.getFileCache(file) : null;
+    const fm = (cache && cache.frontmatter) || {};
+    new APlusModal(this.app, this, path, fm.title || this.taskTitle(path), {
+      aPlus: fm.aPlus || '',
+      aProof: fm.aProof || '',
+      aNotDoing: fm.aNotDoing || '',
+    }).open();
+  }
+
+  async saveAPlus(path, values) {
+    const file = this.app.vault.getAbstractFileByPath(path);
+    if (!file) throw new Error('задача не найдена');
+    await this.app.fileManager.processFrontMatter(file, (fm) => {
+      for (const [key, value] of Object.entries(values)) {
+        if (value) fm[key] = value;
+        else delete fm[key];
+      }
+    });
+    this.scheduleDecorate(true);
+  }
+
+  async openNativePomodoroView(path) {
+    const tn = this.getTaskNotes();
+    if (!tn) return;
+    try {
+      const right = this.app.workspace.getRightLeaf(false);
+      if (right) {
+        await right.setViewState({ type: 'tasknotes-pomodoro-view', active: true });
+      } else if (typeof tn.activatePomodoroView === 'function') {
+        await tn.activatePomodoroView();
+      }
+    } catch (err) {
+      console.error('dusk-cards: open pomodoro view', err);
+      try {
+        if (typeof tn.activatePomodoroView === 'function') await tn.activatePomodoroView();
+      } catch (err2) {
+        console.error('dusk-cards: activatePomodoroView fallback', err2);
+      }
+    }
+    const leaves = this.app.workspace.getLeavesOfType('tasknotes-pomodoro-view');
+    const view = leaves.length ? leaves[0].view : null;
+    if (!view) return;
+    try {
+      const task = await tn.cacheManager.getTaskInfo(path);
+      if (view.selectTask && task) await view.selectTask(task);
+      else if (view.updateTaskButtonFromPath) await view.updateTaskButtonFromPath(path);
+    } catch (err) {
+      console.error('dusk-cards: show task in pomodoro view', err);
+    }
+  }
+
   openAppendModal(path) {
     const file = this.app.vault.getAbstractFileByPath(path);
     const cache = file ? this.app.metadataCache.getFileCache(file) : null;
@@ -441,6 +568,7 @@ class DuskCardsPlugin extends Plugin {
     }
     await this.setFocus(path);
     await tn.pomodoroService.startPomodoro(task, minutes);
+    await this.openNativePomodoroView(path);
     new Notice('🍅 ' + minutes + ' минут: ' + (task.title || this.taskTitle(path)));
   }
 

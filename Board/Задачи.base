@@ -54,6 +54,9 @@ views:
     order:
       - status
       - formula.workModeLabel
+      - aPlus
+      - aProof
+      - aNotDoing
       - nextStep
       - timeEstimate
       - due
@@ -86,7 +89,7 @@ views:
       and:
         - status == "in-progress"
         - or:
-            - '!workMode'
+            - "!workMode"
             - workMode != "background"
     order:
       - formula.workModeLabel
