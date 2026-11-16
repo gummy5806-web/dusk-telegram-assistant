@@ -1,0 +1,93 @@
+/* Ряд действий под карточкой: не перекрывает заголовок и метаданные */
+
+.kanban-view__card-wrapper {
+  position: relative;
+}
+
+.dusk-tools {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px 6px;
+  position: relative;
+  z-index: 5;
+}
+
+.dusk-advance,
+.dusk-tool {
+  position: static;
+  height: 24px;
+  min-width: 26px;
+  padding: 0 6px;
+  border-radius: 999px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.9;
+  transition: opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.dusk-advance {
+  font-size: 14px;
+}
+
+.dusk-advance:hover,
+.dusk-tool:hover {
+  border-color: var(--color-accent);
+  color: var(--text-normal);
+}
+
+.dusk-pomo.is-running {
+  background: var(--color-green);
+  border-color: var(--color-green);
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.dusk-pomo.is-paused {
+  background: var(--color-yellow);
+  border-color: var(--color-yellow);
+  color: var(--text-on-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.dusk-bg.is-background {
+  background: var(--color-purple);
+  border-color: var(--color-purple);
+  color: #fff;
+}
+
+/* Карточка в фоне (агенты/ожидание): приглушена, чтобы не выглядела как «сейчас» */
+.kanban-view__card-wrapper.dusk-background-card .task-card {
+  opacity: 0.55;
+  filter: grayscale(0.4);
+}
+
+.kanban-view__card-wrapper.dusk-background-card:hover .task-card {
+  opacity: 0.85;
+  filter: none;
+}
+
+/* Карточка в фокусе: акцентная рамка */
+.kanban-view__card-wrapper.dusk-focus-card {
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+  border-radius: 10px;
+}
+
+.kanban-view__card-wrapper.dusk-focus-card .task-card {
+  box-shadow: none;
+}
+
+/* NONE-колонку скрываем по её data-атрибуту: карточек там нет (после
+   исключения DAILY/ZETA/PARA из сканирования), но hideEmptyColumns
+   на колонку none не действует — известный баг TaskNotes. */
+.kanban-view__column[data-column="none"],
+.kanban-view__column[data-column-key="none"],
+.kanban-view__column--uncategorized {
+  display: none !important;
+}

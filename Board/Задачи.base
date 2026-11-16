@@ -42,7 +42,63 @@ formulas:
   urgencyScore: if(!due && !scheduled, formula.priorityWeight, formula.priorityWeight + max(0, 10 - formula.daysUntilNext))
   timeTrackedFormatted: if(timeEntries, if(list(timeEntries).filter(value.endTime).map((number(date(value.endTime)) - number(date(value.startTime))) / 60000).reduce(acc + value, 0) >= 60, (list(timeEntries).filter(value.endTime).map((number(date(value.endTime)) - number(date(value.startTime))) / 60000).reduce(acc + value, 0) / 60).floor() + "h " + (list(timeEntries).filter(value.endTime).map((number(date(value.endTime)) - number(date(value.startTime))) / 60000).reduce(acc + value, 0) % 60).round() + "m", list(timeEntries).filter(value.endTime).map((number(date(value.endTime)) - number(date(value.startTime))) / 60000).reduce(acc + value, 0).round() + "m"), "0m")
   dueDateDisplay: if(!due, "", if(date(due).date() == today(), "Today", if(date(due).date() == today() + "1d", "Tomorrow", if(date(due).date() == today() - "1d", "Yesterday", if(date(due) < today(), formula.daysUntilDue * -1 + "d ago", if(date(due) <= today() + "7d", date(due).format("ddd"), date(due).format("MMM D")))))))
+  workModeLabel: if(workMode == "background", "⏳ фон", if(workMode == "focus", "🎯 фокус", ""))
+  focusRank: if(workMode == "focus", 0, if(workMode == "background", 2, 1))
 views:
+  - type: tasknotesTaskList
+    name: 🎯 Сейчас — мой фокус
+    filters:
+      and:
+        - workMode == "focus"
+        - status != "done"
+    order:
+      - status
+      - formula.workModeLabel
+      - nextStep
+      - timeEstimate
+      - due
+      - scheduled
+      - projects
+      - contexts
+    sort:
+      - property: formula.urgencyScore
+        direction: DESC
+  - type: tasknotesTaskList
+    name: ⏳ В фоне — агенты и ожидание
+    filters:
+      and:
+        - workMode == "background"
+        - status != "done"
+    order:
+      - status
+      - formula.workModeLabel
+      - nextStep
+      - projects
+      - contexts
+      - due
+      - scheduled
+    sort:
+      - property: formula.urgencyScore
+        direction: DESC
+  - type: tasknotesTaskList
+    name: 🔥 В работе — только мои
+    filters:
+      and:
+        - status == "in-progress"
+        - or:
+            - '!workMode'
+            - workMode != "background"
+    order:
+      - formula.workModeLabel
+      - nextStep
+      - timeEstimate
+      - due
+      - scheduled
+      - projects
+      - contexts
+    sort:
+      - property: formula.urgencyScore
+        direction: DESC
   - type: tasknotesKanban
     name: 🗂 Поток
     groupBy:
