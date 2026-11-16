@@ -1,6 +1,6 @@
 'use strict';
 
-const { Plugin, Notice, Menu } = require('obsidian');
+const { Plugin, Notice, Menu, Modal } = require('obsidian');
 
 // Жизненный цикл колонок; на «done» кнопка возвращает задачу в «open» (undo).
 const STATUS_ORDER = ['open', 'next', 'in-progress', 'done'];
@@ -56,6 +56,60 @@ function formatSeconds(total) {
   const mm = Math.floor(s / 60);
   const ss = s % 60;
   return String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
+}
+
+class AppendTaskModal extends Modal {
+  constructor(app, plugin, path, title) {
+    super(app);
+    this.plugin = plugin;
+    this.path = path;
+    this.taskTitle = title || path.split('/').pop().replace(/\.md$/, '');
+  }
+
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.addClass('dusk-append-modal');
+    contentEl.createEl('h2', { text: 'Дописать к задаче' });
+    contentEl.createEl('div', { text: this.taskTitle, cls: 'dusk-append-subject' });
+    const ta = contentEl.createEl('textarea', { cls: 'dusk-append-input' });
+    ta.rows = 6;
+    ta.placeholder = 'Шаги, контекст, ссылки — всё, что нужно помнить по задаче';
+    ta.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        this.save();
+      }
+    });
+    this.textarea = ta;
+    const row = contentEl.createDiv({ cls: 'dusk-append-actions' });
+    const openBtn = row.createEl('button', { text: 'Открыть заметку' });
+    openBtn.addEventListener('click', () => {
+      this.close();
+      this.plugin.openTaskNote(this.path);
+    });
+    const saveBtn = row.createEl('button', { text: 'Сохранить', cls: 'mod-cta' });
+    saveBtn.addEventListener('click', () => this.save());
+    window.setTimeout(() => ta.focus(), 0);
+  }
+
+  async save() {
+    const text = this.textarea.value.trim();
+    if (!text) {
+      this.close();
+      return;
+    }
+    try {
+      await this.plugin.appendToTask(this.path, text);
+      new Notice('✍️ Дописано в задачу');
+      this.close();
+    } catch (err) {
+      new Notice('Не удалось дописать: ' + (err && err.message ? err.message : String(err)));
+    }
+  }
+
+  onClose() {
+    this.contentEl.empty();
+  }
 }
 
 class DuskCardsPlugin extends Plugin {
@@ -137,7 +191,31 @@ class DuskCardsPlugin extends Plugin {
     const tools = document.createElement('div');
     tools.className = 'dusk-tools';
 
-    tools.appendChild(this.addAdvanceButton(card, path));
+    const append = document.createElement('button');
+    append.className = 'dusk-tool dusk-append';
+    append.type = 'button';
+    append.textContent = '✍️';
+    append.title = 'Дописать к задаче: текст, шаги, контекст (Cmd+Enter — сохранить)';
+    this.bindNoDrag(append);
+    append.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      this.openAppendModal(path);
+    });
+    tools.appendChild(append);
+
+    const edit = document.createElement('button');
+    edit.className = 'dusk-tool dusk-edit';
+    edit.type = 'button';
+    edit.textContent = '✏️';
+    edit.title = 'Поля задачи: статус, приоритет, даты, оценка, подзадачи';
+    this.bindNoDrag(edit);
+    edit.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      await this.runAction(() => this.openTaskEditModal(path));
+    });
+    tools.appendChild(edit);
 
     const pomo = document.createElement('button');
     pomo.className = 'dusk-tool dusk-pomo';
@@ -164,6 +242,7 @@ class DuskCardsPlugin extends Plugin {
       await this.runAction(() => this.toggleBackground(path));
     });
     tools.appendChild(bg);
+    tools.appendChild(this.addAdvanceButton(card, path));
 
     card.appendChild(tools);
   }
@@ -244,6 +323,40 @@ class DuskCardsPlugin extends Plugin {
       if (!card.querySelector('.dusk-pomo')) continue;
       this.updatePomodoroButton(card, card.dataset.taskPath);
     }
+  }
+
+  openAppendModal(path) {
+    const file = this.app.vault.getAbstractFileByPath(path);
+    const cache = file ? this.app.metadataCache.getFileCache(file) : null;
+    const fm = cache && cache.frontmatter;
+    const title = fm && fm.title ? fm.title : this.taskTitle(path);
+    new AppendTaskModal(this.app, this, path, title).open();
+  }
+
+  openTaskNote(path) {
+    this.app.workspace.openLinkText(path, '', false);
+  }
+
+  async appendToTask(path, text) {
+    const file = this.app.vault.getAbstractFileByPath(path);
+    if (!file) throw new Error('задача не найдена');
+    const source = await this.app.vault.read(file);
+    const next = source.replace(/\s+$/, '') + '\n\n' + text.trim() + '\n';
+    await this.app.vault.modify(file, next);
+  }
+
+  async openTaskEditModal(path) {
+    const tn = this.getTaskNotes();
+    if (!tn || typeof tn.openTaskEditModal !== 'function') {
+      new Notice('TaskNotes не умеет открыть редактор полей — открой заметку');
+      return;
+    }
+    const task = await tn.cacheManager.getTaskInfo(path);
+    if (!task) {
+      new Notice('TaskNotes пока не видит задачу — обнови борд');
+      return;
+    }
+    await tn.openTaskEditModal(task);
   }
 
   taskTitle(path) {

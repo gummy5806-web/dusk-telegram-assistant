@@ -1,9 +1,9 @@
 {
   "id": "dusk-cards",
   "name": "Dusk Cards",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "minAppVersion": "1.0.0",
-  "description": "Кнопки на карточках канбана TaskNotes: статус, помодоро 25 мин, метка «в фоне»",
+  "description": "Кнопки на карточках канбана TaskNotes: статус, поля, «дописать», помодоро 15/25/45/60, метка «в фоне»",
   "author": "asan",
   "isDesktopOnly": false
 }

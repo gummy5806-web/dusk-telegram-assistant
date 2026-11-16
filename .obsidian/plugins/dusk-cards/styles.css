@@ -83,6 +83,27 @@
   box-shadow: none;
 }
 
+/* ---------- «Дописать к задаче» ---------- */
+
+.dusk-append-modal .dusk-append-subject {
+  color: var(--text-muted);
+  margin: 0 0 10px;
+  font-size: 0.95em;
+}
+
+.dusk-append-modal .dusk-append-input {
+  width: 100%;
+  min-height: 150px;
+  resize: vertical;
+}
+
+.dusk-append-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
 /* NONE-колонку скрываем по её data-атрибуту: карточек там нет (после
    исключения DAILY/ZETA/PARA из сканирования), но hideEmptyColumns
    на колонку none не действует — известный баг TaskNotes. */
