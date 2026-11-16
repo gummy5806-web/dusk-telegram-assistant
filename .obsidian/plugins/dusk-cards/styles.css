@@ -62,25 +62,28 @@
   color: #fff;
 }
 
-/* Карточка в фоне (агенты/ожидание): приглушена, чтобы не выглядела как «сейчас» */
+/* Карточка в фоне (агенты/ожидание): не затемняем текст — фиолетовая полоса слева */
 .kanban-view__card-wrapper.dusk-background-card .task-card {
-  opacity: 0.55;
-  filter: grayscale(0.4);
+  opacity: 1;
+  filter: none;
+  box-shadow: inset 3px 0 0 var(--color-purple);
+  border-radius: 8px;
 }
 
 .kanban-view__card-wrapper.dusk-background-card:hover .task-card {
-  opacity: 0.85;
+  opacity: 1;
   filter: none;
 }
 
-/* Карточка в фокусе: акцентная рамка */
+/* Карточка в фокусе: акцентная полоса слева + мягкий контур */
 .kanban-view__card-wrapper.dusk-focus-card {
-  box-shadow: inset 0 0 0 2px var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent) inset;
   border-radius: 10px;
 }
 
 .kanban-view__card-wrapper.dusk-focus-card .task-card {
-  box-shadow: none;
+  box-shadow: inset 3px 0 0 var(--color-accent);
+  border-radius: 8px;
 }
 
 /* ---------- «Дописать к задаче» ---------- */
