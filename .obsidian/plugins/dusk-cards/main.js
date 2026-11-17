@@ -203,11 +203,15 @@ class DuskCardsPlugin extends Plugin {
     return tn;
   }
 
-  getWorkMode(path) {
+  getFrontmatter(path) {
     const file = this.app.vault.getAbstractFileByPath(path);
     if (!file) return null;
     const cache = this.app.metadataCache.getFileCache(file);
-    const fm = cache && cache.frontmatter;
+    return (cache && cache.frontmatter) || null;
+  }
+
+  getWorkMode(path) {
+    const fm = this.getFrontmatter(path);
     return fm ? fm[WORK_MODE_KEY] : null;
   }
 
@@ -267,7 +271,9 @@ class DuskCardsPlugin extends Plugin {
     }
     const runningHere = !!(state && state.currentSession && state.currentSession.taskPath === path);
 
-    menu.addItem((i) => i.setTitle('A+ задача: узкое место и доказательство')
+    const fmNow = this.getFrontmatter(path) || {};
+    const hasA = !!(fmNow.aPlus || fmNow.aProof || fmNow.aNotDoing);
+    menu.addItem((i) => i.setTitle(hasA ? 'A+ задача (заполнена)' : 'Сделать A+ задачей')
       .setIcon('star').onClick(() => this.openAPlusModal(path)));
     menu.addItem((i) => i.setTitle('Дописать к задаче')
       .setIcon('pencil').onClick(() => this.openAppendModal(path)));
@@ -331,9 +337,19 @@ class DuskCardsPlugin extends Plugin {
       const next = state.isRunning ? left : '⏸ ' + left;
       if (btn.textContent !== next) btn.textContent = next;
       btn.title = 'Помодоро на этой задаче. Клик — меню действий';
+      btn.classList.remove('is-aplus');
     } else {
-      if (btn.textContent !== '⋯') btn.textContent = '⋯';
-      btn.title = 'Действия с задачей: помодоро, дописать, поля, A+, фон, статус';
+      const fm = this.getFrontmatter(path) || {};
+      const aplus = [fm.aPlus && ('Узкое место: ' + fm.aPlus),
+        fm.aProof && ('Доказательство: ' + fm.aProof),
+        fm.aNotDoing && ('Не делаю: ' + fm.aNotDoing)].filter(Boolean);
+      const hasA = aplus.length > 0;
+      btn.classList.toggle('is-aplus', hasA);
+      const label = hasA ? 'A+' : '⋯';
+      if (btn.textContent !== label) btn.textContent = label;
+      btn.title = hasA
+        ? 'A+ задача заполнена.\n' + aplus.join('\n') + '\nКлик — меню действий'
+        : 'Клик — меню: помодоро, дописать, поля, A+, фон, статус';
     }
   }
 
@@ -500,6 +516,8 @@ class DuskCardsPlugin extends Plugin {
   async saveAPlus(path, values) {
     const file = this.app.vault.getAbstractFileByPath(path);
     if (!file) throw new Error('задача не найдена');
+    const hasAny = Object.values(values).some((v) => v);
+    if (hasAny) await this.clearAPlusExcept(path);
     await this.app.fileManager.processFrontMatter(file, (fm) => {
       for (const [key, value] of Object.entries(values)) {
         if (value) fm[key] = value;
@@ -507,6 +525,23 @@ class DuskCardsPlugin extends Plugin {
       }
     });
     this.scheduleDecorate(true);
+  }
+
+  async clearAPlusExcept(path) {
+    const files = this.app.vault.getMarkdownFiles();
+    for (const file of files) {
+      if (!file.path.startsWith(TASKS_FOLDER)) continue;
+      if (file.path === path) continue;
+      const cache = this.app.metadataCache.getFileCache(file);
+      const fm = cache && cache.frontmatter;
+      if (!fm) continue;
+      if (!(fm.aPlus || fm.aProof || fm.aNotDoing)) continue;
+      await this.app.fileManager.processFrontMatter(file, (next) => {
+        delete next.aPlus;
+        delete next.aProof;
+        delete next.aNotDoing;
+      });
+    }
   }
 
   openTaskNote(path) {

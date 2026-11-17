@@ -46,27 +46,6 @@ formulas:
   focusRank: if(workMode == "focus", 0, if(workMode == "background", 2, 1))
 views:
   - type: tasknotesTaskList
-    name: 🎯 Сейчас — мой фокус
-    filters:
-      and:
-        - workMode == "focus"
-        - status != "done"
-    order:
-      - status
-      - formula.workModeLabel
-      - aPlus
-      - aProof
-      - aNotDoing
-      - nextStep
-      - timeEstimate
-      - due
-      - scheduled
-      - projects
-      - contexts
-    sort:
-      - property: formula.urgencyScore
-        direction: DESC
-  - type: tasknotesTaskList
     name: ⏳ В фоне — агенты и ожидание
     filters:
       and:

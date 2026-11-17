@@ -45,6 +45,13 @@
   min-width: 54px;
 }
 
+.dusk-menu.is-aplus {
+  color: var(--color-yellow);
+  border-color: var(--color-yellow);
+  font-size: 13px;
+  min-width: 36px;
+}
+
 /* Карточка в фоне: не затемняем текст — фиолетовая полоса слева */
 .kanban-view__card-wrapper.dusk-background-card .task-card {
   opacity: 1;
