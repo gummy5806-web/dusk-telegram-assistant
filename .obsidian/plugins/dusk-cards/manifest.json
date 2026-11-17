@@ -1,7 +1,7 @@
 {
   "id": "dusk-cards",
   "name": "Dusk Cards",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "minAppVersion": "1.0.0",
   "description": "Карточки TaskNotes: меню ⋯ (A+, дописать, поля, помодоро с нативной панелью, фон, статус), полосы фокуса/фона",
   "author": "asan",
